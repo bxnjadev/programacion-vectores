@@ -1,0 +1,1885 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arreglos en Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@500;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Idea de diseño: apunte de curso con barra lateral de secciones; cada ejemplo es un visor paso a paso (código, memoria, salida). */
+:root{
+  --bg:#f7f6f3; --surface:#ffffff; --ink:#1c2732; --muted:#566573; --line:#dedbd4;
+  --green:#17956c; --green-soft:#e1f4ec; --blue:#2478d0; --blue-soft:#e3effb; --mag:#a33bc4; --mag-soft:#f4e6fa;
+  --purple:#5b4fbb; --code-bg:#f1efea; --free:#e9e7e1; --free-ink:#8a8f94; --warn:#c2362f; --warn-soft:#fbe9e7;
+  --font-d:'Roboto Condensed','Arial Narrow',sans-serif; --font-b:'Roboto',system-ui,sans-serif; --font-m:'JetBrains Mono',Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161b; --surface:#1a2129; --ink:#e7ecf0; --muted:#9aa8b5; --line:#2c3742;
+  --green:#1fa97a; --green-soft:#12302a; --blue:#4ea1f3; --blue-soft:#142a40; --mag:#cf6ae8; --mag-soft:#2e1a38;
+  --purple:#9a8cf0; --code-bg:#141a20; --free:#232c35; --free-ink:#7d8a96; --warn:#ff7b72; --warn-soft:#3a1f1d; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#11161b; --surface:#1a2129; --ink:#e7ecf0; --muted:#9aa8b5; --line:#2c3742;
+  --green:#1fa97a; --green-soft:#12302a; --blue:#4ea1f3; --blue-soft:#142a40; --mag:#cf6ae8; --mag-soft:#2e1a38;
+  --purple:#9a8cf0; --code-bg:#141a20; --free:#232c35; --free-ink:#7d8a96; --warn:#ff7b72; --warn-soft:#3a1f1d; color-scheme:dark;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.6}
+code,.mono{font-family:var(--font-m);font-size:.88em}
+p code,li code,td code,summary code,h3 code{background:var(--code-bg);padding:.08em .38em;border-radius:5px;border:1px solid var(--line)}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:4px}
+
+/* estructura */
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:0;max-width:1320px;margin:0 auto}
+nav.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:28px 18px 28px 24px;border-right:1px solid var(--line)}
+nav.side .brand{font-family:var(--font-d);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:15px;color:var(--purple);margin:0 0 4px}
+nav.side .brand-sub{font-size:13px;color:var(--muted);margin:0 0 20px;line-height:1.4}
+nav.side ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;counter-reset:s}
+nav.side a{display:flex;gap:10px;align-items:baseline;text-decoration:none;color:var(--ink);padding:7px 10px;border-radius:8px;font-size:15px;line-height:1.3}
+nav.side a .n{font-family:var(--font-d);font-weight:700;color:var(--muted);width:1.3em;flex:none}
+nav.side a:hover{background:var(--code-bg)}
+nav.side a.on{background:var(--green-soft);font-weight:500}
+nav.side a.on .n{color:var(--green)}
+.side-tools{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+main{padding:34px 40px 80px;min-width:0}
+.wrap{max-width:1000px;margin:0 auto}
+
+/* portada */
+.hero{padding:6px 0 26px;border-bottom:1px solid var(--line);margin-bottom:30px}
+.eyebrow{font-family:var(--font-d);font-weight:500;letter-spacing:.16em;text-transform:uppercase;font-size:14px;color:var(--muted)}
+h1{font-family:var(--font-d);font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:clamp(30px,5vw,46px);line-height:1.1;margin:6px 0 10px;color:var(--ink);text-wrap:balance}
+.hero p.lead{font-size:19px;max-width:62ch;margin:0 0 6px}
+.meta{color:var(--muted);font-size:15px}
+.how{margin:20px 0 0;padding:14px 18px;border-left:4px solid var(--green);background:var(--surface);border-radius:0 10px 10px 0;font-size:15.5px}
+.how b{font-weight:500;color:var(--green)}
+.agenda{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0 0;padding:0;list-style:none}
+.agenda li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.agenda b{font-family:var(--font-d);text-transform:uppercase;letter-spacing:.08em;font-size:15px;color:var(--purple)}
+.agenda span{font-size:14px;color:var(--muted);line-height:1.4}
+
+/* secciones */
+section.sec{padding-top:12px;margin-top:46px;scroll-margin-top:12px}
+h2{font-family:var(--font-d);font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:clamp(24px,3.4vw,32px);margin:0 0 4px;display:flex;align-items:baseline;gap:14px;text-wrap:balance}
+h2 .n{color:var(--green);font-size:.8em}
+.sec-sub{color:var(--muted);margin:0 0 20px;font-size:16px}
+h3{font-family:var(--font-d);font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:20px;margin:38px 0 8px;color:var(--ink);text-wrap:balance}
+h3::before{content:"";display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:10px;vertical-align:1px}
+h4{font-family:var(--font-d);text-transform:uppercase;letter-spacing:.08em;font-size:15px;margin:0 0 6px;color:var(--muted);font-weight:700}
+p{margin:0 0 12px;max-width:72ch}
+ul.b{margin:0 0 14px;padding-left:1.2em;max-width:72ch}
+ul.b li{margin:4px 0}
+ul.b li::marker{color:var(--green)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start;margin:14px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0;overflow-x:auto}
+.cols>*{min-width:0}
+.card.alert{border-color:var(--mag);background:var(--mag-soft)}
+.card.alert h4{color:var(--mag)}
+.card.ok{border-color:var(--green)}
+.big{font-family:var(--font-d);font-weight:700;font-size:34px;line-height:1.1;color:var(--green)}
+.callout{margin:16px 0;padding:12px 16px;border-radius:10px;background:var(--purple);color:#fff;font-weight:500;text-align:center;letter-spacing:.02em}
+:root[data-theme="dark"] .callout{background:#3b3487}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .callout{background:#3b3487}}
+table.t{border-collapse:collapse;width:100%;font-size:15.5px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+table.t th,table.t td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
+table.t th{font-family:var(--font-d);text-transform:uppercase;letter-spacing:.07em;font-size:14px;background:var(--code-bg)}
+.tw{overflow-x:auto}
+pre.static{font-family:var(--font-m);font-size:14px;line-height:1.55;background:var(--surface);border:1px solid var(--green);border-radius:12px;padding:14px 16px;overflow-x:auto;margin:0}
+
+/* arreglos (visualizador) */
+.arr{display:inline-flex;flex-direction:column;gap:0;vertical-align:top;max-width:100%}
+.arr-row{display:flex;gap:4px}
+.cellw{display:flex;flex-direction:column;align-items:center;min-width:46px}
+.cell{min-width:46px;height:44px;padding:0 8px;display:flex;align-items:center;justify-content:center;background:var(--green);color:#fff;font-family:var(--font-m);font-size:15px;font-weight:700;border-radius:4px;white-space:pre;transition:background .15s}
+.cell.free{background:var(--free);color:var(--free-ink);font-weight:400}
+.cell.b{background:var(--blue);color:#fff;font-weight:700} .cell.m{background:var(--mag);color:#fff;font-weight:700} .cell.d{background:var(--ink);color:var(--bg);font-weight:700}
+.cell.flash{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(1.18)}100%{transform:scale(1)}}
+.ix{font-size:12.5px;color:var(--muted);font-family:var(--font-m);margin-top:3px;min-height:1.2em}
+.ptr{display:flex;flex-direction:column;gap:2px;align-items:center;min-height:2px}
+.chip{font-family:var(--font-m);font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--blue-soft);color:var(--blue);border:1px solid var(--blue);white-space:nowrap}
+.chip.g{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.chip.p{background:var(--mag-soft);color:var(--mag);border-color:var(--mag)}
+.arr-name{font-family:var(--font-m);font-weight:700;font-size:14px;margin:0 0 5px;color:var(--ink)}
+.arr-name small{font-weight:400;color:var(--muted)}
+.mat{display:inline-grid;gap:4px;align-items:center;max-width:100%}
+.mat .hd{font-family:var(--font-m);font-size:12.5px;color:var(--muted);text-align:center;min-width:28px}
+.mat .hd.on{color:var(--blue);font-weight:700}
+.tensor{position:relative;width:170px;height:130px}
+.tensor .layer{position:absolute;display:grid;grid-template-columns:repeat(3,30px);gap:3px}
+.tensor .layer i{display:block;width:30px;height:30px;border-radius:3px;background:var(--green);opacity:.55}
+.tensor .l3{left:36px;top:0}.tensor .l2{left:18px;top:18px}.tensor .l1{left:0;top:36px}
+.tensor .l1 i{opacity:1}
+.strips{display:flex;flex-direction:column;gap:10px;margin:12px 0;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+.strip{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.strip .st-note{font-size:15px;min-width:200px;flex:1}
+.strip .arr .cell{height:38px}
+.strip .arr .ix{display:none}
+
+/* visor paso a paso */
+.rn{border:1px solid var(--line);background:var(--surface);border-radius:14px;margin:14px 0 22px;overflow:hidden}
+.rn-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 14px;background:var(--code-bg);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rn-title{font-family:var(--font-d);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--purple)}
+.rn-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:0}
+.rn-left{padding:14px;border-right:1px solid var(--line);min-width:0;display:flex;flex-direction:column;gap:12px}
+.rn-right{padding:14px;min-width:0;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+@media (max-width:900px){.rn-grid{grid-template-columns:1fr}.rn-left{border-right:0;border-bottom:1px solid var(--line)}}
+.code{font-family:var(--font-m);font-size:13.5px;line-height:1.6;border:1px solid var(--green);border-radius:10px;background:var(--surface);max-height:430px;overflow:auto;padding:8px 0}
+.ln{display:flex;white-space:pre;padding:0 12px 0 0;border-left:4px solid transparent}
+.ln .no{display:inline-block;width:2.8em;text-align:right;padding-right:10px;color:var(--muted);user-select:none;flex:none;opacity:.7}
+.ln.cur{background:var(--green-soft);border-left-color:var(--green)}
+.ln.err{background:var(--warn-soft);border-left-color:var(--warn)}
+.k{color:var(--purple);font-weight:700}.s{color:var(--green)}.nu{color:var(--blue)}.cm{color:var(--muted);font-style:italic}.bi{color:var(--mag);font-weight:700}
+textarea{width:100%;font-family:var(--font-m);font-size:13.5px;line-height:1.55;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);color:var(--ink);resize:vertical}
+textarea.codeed{min-height:260px;border-color:var(--blue)}
+textarea.inp{min-height:48px}
+.lbl{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.preset{font:inherit;font-size:12.5px;font-family:var(--font-m);padding:2px 9px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.preset:hover{border-color:var(--green)}
+.preset.sel{background:var(--green-soft);border-color:var(--green)}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:14.5px;font-weight:500;padding:7px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:38px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover:not(:disabled){border-color:var(--green)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.btn.sm{padding:4px 10px;min-height:30px;font-size:13.5px}
+input[type=range]{flex:1;min-width:110px;accent-color:var(--green)}
+select.btn{padding-right:8px}
+.count{font-family:var(--font-m);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.desc{min-height:3.1em;padding:9px 12px;border-radius:10px;background:var(--blue-soft);border:1px solid var(--blue);font-size:15px;line-height:1.45}
+.desc b{font-family:var(--font-m);font-size:.92em}
+.desc.err{background:var(--warn-soft);border-color:var(--warn)}
+.mem{display:flex;flex-direction:column;gap:14px;min-height:60px}
+.mem-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mem-h h4{margin:0}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.vars{display:flex;flex-wrap:wrap;gap:8px}
+.var{display:inline-flex;font-family:var(--font-m);font-size:13.5px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.var span{padding:3px 8px}
+.var .vn{background:var(--code-bg);color:var(--muted)}
+.var .vv{font-weight:700}
+.var.chg{border-color:var(--mag);animation:chg .6s ease-out}
+.var.chg .vv{color:var(--mag)}
+@keyframes chg{0%{box-shadow:0 0 0 4px var(--mag-soft)}100%{box-shadow:none}}
+.con{position:relative;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:22px 12px 10px;min-height:96px}
+.con .tag{position:absolute;top:-1px;left:14px;background:var(--code-bg);color:var(--muted);font-size:11.5px;font-family:var(--font-d);letter-spacing:.08em;text-transform:uppercase;padding:1px 10px;border:1px solid var(--line);border-top:0;border-radius:0 0 6px 6px}
+.con pre{margin:0;font-family:var(--font-m);font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto}
+.con .er{color:var(--warn);font-weight:700}
+.con .hint{display:block;margin-top:6px;color:var(--muted);font-size:13px;font-family:var(--font-b);white-space:normal}
+
+/* ejercicios */
+.ej{margin:30px 0 8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.ej-h{display:flex;align-items:center;gap:14px;padding:14px 20px;background:var(--purple);color:#fff}
+:root[data-theme="dark"] .ej-h{background:#3b3487}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ej-h{background:#3b3487}}
+.ej-h .num{font-family:var(--font-d);font-weight:700;font-size:15px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.ej-h h3{margin:0;color:#fff;font-size:20px}
+.ej-h h3::before{display:none}
+.ej-b{padding:18px 22px 6px}
+.ej-b ul{margin:0 0 12px;padding-left:1.2em}
+.ej-b li{margin:5px 0}
+.ej-b li::marker{color:var(--purple)}
+.ej-a{padding:4px 22px 18px}
+.ej-a .rn{margin:8px 0 8px}
+.q{margin:8px 0 6px;padding:11px 14px;border-radius:10px;background:var(--mag-soft);border:1px solid var(--mag);font-size:15.5px}
+.q b{color:var(--mag)}
+body.hide-sol .ej-a{display:none}
+footer.end{margin-top:60px;padding:30px 0;border-top:1px solid var(--line);text-align:center}
+footer.end .qm{font-family:var(--font-d);font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:28px}
+.topbar{display:none}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr}
+  nav.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px}
+  nav.side ol{flex-direction:row;flex-wrap:wrap;gap:6px}
+  nav.side a{border:1px solid var(--line);padding:5px 10px}
+  nav.side a .n{display:none}
+  .side-tools{flex-direction:row;flex-wrap:wrap}
+  main{padding:22px 16px 60px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side" aria-label="Secciones">
+  <p class="brand">Arreglos</p>
+  <p class="brand-sub">Programación · Prof. Benjamín Miranda<br>UCN · Segundo semestre 2026</p>
+  <ol id="navlist">
+    <li><a href="#inicio"><span class="n">0</span>Inicio</a></li>
+    <li><a href="#estructuras"><span class="n">1</span>Estructuras de datos</a></li>
+    <li><a href="#vectores"><span class="n">2</span>Vectores</a></li>
+    <li><a href="#recorrido"><span class="n">3</span>Recorrido</a></li>
+    <li><a href="#busquedas"><span class="n">4</span>Búsquedas</a></li>
+    <li><a href="#ordenamiento"><span class="n">5</span>Ordenamiento</a></li>
+    <li><a href="#matrices"><span class="n">6</span>Matrices</a></li>
+    <li><a href="#insercion"><span class="n">7</span>Inserción y eliminación</a></li>
+    <li><a href="#paralelos"><span class="n">8</span>Vectores paralelos</a></li>
+  </ol>
+  <div class="side-tools">
+    <button class="btn sm" id="toggleSol" type="button" aria-pressed="false">Ocultar resoluciones</button>
+    <button class="btn sm" id="expandSol" type="button">Ir al primer ejercicio</button>
+  </div>
+</nav>
+
+<main><div class="wrap">
+
+<header class="hero" id="inicio">
+  <div class="eyebrow">Programación · Segundo semestre 2026</div>
+  <h1>Programación: Arreglos</h1>
+  <p class="lead">Todo el contenido de la clase en una sola página, con los ejercicios resueltos y un visor para ver cómo se ejecuta cada programa línea por línea.</p>
+  <p class="meta">Profesor: Benjamín Miranda · Departamento de Ingeniería de Sistemas y Computación, Universidad Católica del Norte, Antofagasta</p>
+  <div class="how"><b>Cómo usar los ejemplos.</b> En cada visor, <b>Siguiente</b> ejecuta una línea; la línea resaltada es la que se acaba de ejecutar. El panel <b>Memoria</b> muestra las variables y los vectores (azul: se leyó, magenta: se escribió), y <b>Salida</b> muestra lo que imprime el programa. Puedes cambiar los datos de entrada o pulsar <b>Editar código</b> y probar tus propias versiones.</div>
+  <h4 style="margin-top:22px">En esta presentación veremos</h4>
+  <ul class="agenda">
+    <li><b>Arreglos</b><span>qué son y sus tipos</span></li>
+    <li><b>Vectores</b><span>creación, acceso y despliegue</span></li>
+    <li><b>Recorrido</b><span>suma, promedio, máx. y mín.</span></li>
+    <li><b>Búsquedas</b><span>secuencial y binaria</span></li>
+    <li><b>Ordenamiento</b><span>burbuja y selección</span></li>
+    <li><b>Matrices</b><span>creación y recorridos</span></li>
+    <li><b>Inserción y eliminación</b><span>con tamaño fijo</span></li>
+    <li><b>Vectores paralelos</b><span>simulando objetos</span></li>
+  </ul>
+</header>
+
+<!-- 1 ESTRUCTURAS -->
+<section class="sec" id="estructuras">
+  <h2><span class="n">1</span>Estructuras de datos</h2>
+  <p class="sec-sub">Por qué necesitamos guardar muchos datos bajo un mismo nombre.</p>
+
+  <h3>Un problema: guardar 40 notas</h3>
+  <p>Un profesor necesita guardar las 40 notas de su curso y calcular el promedio. Con lo que sabemos hasta ahora… ¿creamos 40 variables?</p>
+  <div class="cols">
+    <pre class="static">nota1 = float(input("Nota 1: "))
+nota2 = float(input("Nota 2: "))
+nota3 = float(input("Nota 3: "))
+...
+nota40 = float(input("Nota 40: "))
+promedio = (nota1 + nota2 + nota3
+            + ... + nota40) / 40</pre>
+    <div class="card alert">
+      <h4>¿40 variables?</h4>
+      <ul class="b">
+        <li>El código es largo y repetitivo.</li>
+        <li>No podemos recorrer <code>nota1</code>, <code>nota2</code>, … con un <code>for</code>.</li>
+        <li>Buscar la nota más alta requeriría comparar las 40 variables una por una.</li>
+        <li>Si el curso tiene 41 estudiantes, hay que cambiar el programa.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">Necesitamos guardar muchos datos bajo un mismo nombre</div>
+
+  <h3>¿Qué es una estructura de datos?</h3>
+  <p>Una estructura de datos es una forma de organizar y almacenar varios datos en la memoria bajo un solo nombre, para poder acceder a ellos y procesarlos fácilmente.</p>
+  <div class="cols">
+    <div class="card"><h4>Sin estructura: 40 variables</h4>
+      <div class="viz" data-v='[5.5,"6.0",4.2,3.9,"…",6.8]' data-o='{"vars":["nota1","nota2","nota3","nota4","…","nota40"],"noidx":true}'></div>
+    </div>
+    <div class="card ok"><h4>Con una estructura de datos</h4>
+      <div class="viz" data-v='[5.5,"6.0",4.2,3.9,"…",6.8]' data-o='{"name":"notas","labels":["0","1","2","3","…","39"]}'></div>
+      <p style="margin:10px 0 0;font-size:15px">Un solo nombre, 40 posiciones numeradas.</p>
+    </div>
+  </div>
+  <ul class="b">
+    <li>Ejemplos de estructuras de datos: arreglos, listas, pilas, colas y diccionarios.</li>
+    <li>Partiremos por la más simple: el arreglo. Con él, las 40 notas se recorren con un <code>for</code>.</li>
+  </ul>
+  <p>Así queda el programa del profesor con un arreglo (aquí con 5 notas; para 40 solo se cambia un número):</p>
+  <div class="rn-host" data-ex="problema-arreglo" data-title="Promedio de notas con un arreglo"></div>
+
+  <h3>¿Qué es un arreglo?</h3>
+  <p>Un arreglo es una estructura de datos que almacena una colección de elementos, a los que se accede mediante un índice que indica su posición.</p>
+  <div class="cols">
+    <ul class="b">
+      <li>Sus elementos se guardan uno a continuación del otro.</li>
+      <li>Tiene un <b>tamaño fijo</b>: se define al crearlo y no cambia.</li>
+      <li>El primer índice es 0 y el último es tamaño − 1.</li>
+      <li>Normalmente todos sus elementos son del mismo tipo.</li>
+    </ul>
+    <div class="card"><h4>Arreglo de tamaño 5</h4>
+      <div class="viz" data-v='[7,3,9,1,5]' data-o='{}'></div>
+      <p style="margin:10px 0 0;font-size:15px">Índices: 0, 1, 2, 3, 4</p>
+    </div>
+  </div>
+  <div class="card ok">
+    <h4>¿Cómo lo trabajaremos en Python?</h4>
+    <p style="margin:0">Usaremos <b>listas</b> para simular arreglos, pero respetando un tamaño constante: si definimos <code>a = [0, 0, 0, 0]</code>, su tamaño siempre será 4.</p>
+  </div>
+
+  <h3>Tipos de arreglos</h3>
+  <div class="cols">
+    <div class="card"><h4>Vector · 1 dimensión</h4>
+      <div class="viz" data-v='[1,2,3]' data-o='{"noidx":true}'></div>
+      <p style="margin:10px 0 0;font-size:15px">Un solo índice: <code>v[i]</code></p></div>
+    <div class="card"><h4>Matriz · 2 dimensiones</h4>
+      <div class="viz" data-v='[[1,2,3],[4,5,6],[7,8,9]]' data-o='{"noidx":true}'></div>
+      <p style="margin:10px 0 0;font-size:15px">Dos índices: <code>m[f][c]</code></p></div>
+    <div class="card"><h4>Tensor · 3 o más dimensiones</h4>
+      <div class="tensor" aria-hidden="true"><div class="layer l3"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="layer l2"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="layer l1"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      <p style="margin:10px 0 0;font-size:15px">Tres o más índices: <code>t[i][j][k]</code></p></div>
+  </div>
+  <p>En este curso trabajaremos con vectores y matrices. El tensor solo lo mencionamos: es la generalización a más dimensiones.</p>
+</section>
+
+<!-- 2 VECTORES -->
+<section class="sec" id="vectores">
+  <h2><span class="n">2</span>Vectores</h2>
+  <p class="sec-sub">Arreglos de una dimensión.</p>
+
+  <h3>Creación</h3>
+  <p>Un vector se crea escribiendo sus elementos entre corchetes. Dos formas habituales:</p>
+  <h4>1. Con valores conocidos</h4>
+  <div class="rn-host" data-ex="crea-conocidos" data-title="Vector con valores conocidos"></div>
+  <h4>2. Inicializado y llenado por el usuario</h4>
+  <div class="rn-host" data-ex="crea-llenado" data-title="Inicializar en 0 y llenar con input"></div>
+  <ul class="b">
+    <li>El tamaño queda fijo al crearlo: <code>v</code> siempre tendrá 5 posiciones.</li>
+    <li>Luego reemplazamos los valores por índice, nunca agregamos.</li>
+  </ul>
+
+  <h3>Acceso</h3>
+  <p>Cada elemento se accede con el nombre del vector y su índice entre corchetes: <code>v[indice]</code>. El índice va desde 0 hasta <code>len(v) − 1</code>.</p>
+  <div class="rn-host" data-ex="acceso" data-title="Leer y escribir"></div>
+  <div class="card alert">
+    <h4>¡Cuidado con el índice!</h4>
+    <ul class="b" style="margin:0">
+      <li><code>v[4]</code> no existe en un vector de tamaño 4: Python lanza <code>IndexError</code>.</li>
+      <li>El último elemento siempre es <code>v[len(v) - 1]</code>.</li>
+    </ul>
+  </div>
+  <div class="rn-host" data-ex="acceso-error" data-title="Provocar un IndexError"></div>
+
+  <h3>La función <code>len</code></h3>
+  <p><code>len(v)</code> entrega la cantidad de elementos del vector, es decir, su tamaño. Como nuestros vectores tienen tamaño fijo, <code>len(v)</code> siempre devuelve el mismo valor.</p>
+  <div class="rn-host" data-ex="len" data-title="len(v) = 4, entonces los índices válidos son 0 a 3"></div>
+  <h4>¿Para qué lo usamos?</h4>
+  <ul class="b">
+    <li>Saber cuántas veces recorrer: <code>range(len(v))</code>.</li>
+    <li>Obtener el último índice: <code>len(v) - 1</code>.</li>
+  </ul>
+
+  <h3>Despliegue</h3>
+  <p>Desplegar es mostrar el contenido del vector. Podemos hacerlo completo o elemento por elemento.</p>
+  <div class="cols">
+    <div><h4>Completo</h4><div class="rn-host" data-ex="despl-completo" data-title="print(v)"></div></div>
+    <div><h4>Elemento por elemento</h4><div class="rn-host" data-ex="despl-elem" data-title="Un print por posición"></div></div>
+  </div>
+  <p>La segunda forma nos permite dar formato y mostrar la posición de cada valor.</p>
+
+  <div class="ej" id="ej1">
+    <div class="ej-h"><span class="num">Ejercicio 1</span><h3>Creación y acceso</h3></div>
+    <div class="ej-b"><ul>
+      <li>Cree un vector de 5 posiciones inicializado en 0.</li>
+      <li>Pida al usuario 5 temperaturas y guárdelas en el vector.</li>
+      <li>Muestre la primera y la última temperatura usando sus índices.</li>
+      <li>Cambie la temperatura de la posición 2 por un valor que ingrese el usuario.</li>
+      <li>Despliegue el vector completo indicando la posición de cada temperatura.</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej1" data-title="Ejercicio 1"></div></div>
+  </div>
+</section>
+
+<!-- 3 RECORRIDO -->
+<section class="sec" id="recorrido">
+  <h2><span class="n">3</span>Recorrido de un vector</h2>
+  <p class="sec-sub">Visitar cada posición, de la primera a la última.</p>
+  <p>Recorrer un vector es visitar cada una de sus posiciones, de la primera a la última. Se hace con un <code>for</code> cuyo índice <code>i</code> toma los valores de <code>range(len(v))</code>.</p>
+  <div class="cols">
+    <pre class="static">for i in range(len(v)):
+    # trabajar con v[i]</pre>
+    <div class="card"><div class="viz" data-v='[4,9,2,7]' data-o='{"labels":["i=0","i=1","i=2","i=3"]}'></div></div>
+  </div>
+  <h4>¿Por qué <code>range(len(v))</code>?</h4>
+  <ul class="b">
+    <li><code>len(v)</code> es 4, entonces <code>range(4)</code> genera 0, 1, 2, 3: exactamente los índices válidos.</li>
+    <li>Si el vector cambia de tamaño en otro programa, el ciclo se adapta sin modificar el código.</li>
+  </ul>
+
+  <h3>Ruteo: recorrido de un vector</h3>
+  <p>Avanza paso a paso: <code>i</code> comienza en 0, se muestra <code>v[0]</code> que vale 4; luego <code>i</code> avanza a 1, 2 y 3 (la última posición) y el <code>range</code> termina.</p>
+  <div class="rn-host" data-ex="rec-ruteo" data-title="Ruteo del recorrido"></div>
+
+  <h3>Suma y promedio</h3>
+  <p>Para sumar los elementos usamos un <b>acumulador</b>: comienza en 0 y en cada iteración le sumamos <code>v[i]</code>. El promedio es la suma dividida por la cantidad de elementos. Al terminar: suma = 22 y promedio = 22 / 4 = 5.5.</p>
+  <div class="rn-host" data-ex="suma-prom" data-title="Ruteo del acumulador"></div>
+
+  <h3>Máximo y mínimo</h3>
+  <p>Partimos suponiendo que el primer elemento es el mayor y el menor. Luego recorremos desde la posición 1 y actualizamos cuando encontramos un valor más grande o más pequeño.</p>
+  <div class="card"><h4>¿Por qué <code>v[0]</code> y no −1?</h4>
+    <ul class="b" style="margin:0">
+      <li>Si todos los valores fueran negativos, <code>mayor = -1</code> daría un resultado incorrecto.</li>
+      <li><code>v[0]</code> es un valor real del vector, así que siempre es un buen punto de partida.</li>
+      <li>Para saber dónde está el mayor, guardamos también su índice: <code>pos_mayor = i</code>.</li>
+    </ul></div>
+  <div class="rn-host" data-ex="maxmin" data-title="Ruteo: máximo y mínimo"></div>
+  <p>Resultado: mayor = 9 (posición 1) y menor = 2 (posición 2).</p>
+
+  <div class="ej" id="ej2">
+    <div class="ej-h"><span class="num">Ejercicio 2</span><h3>Recorrido</h3></div>
+    <div class="ej-b"><ul>
+      <li>Cree un vector con las 8 notas de un curso: <code>[5.5, 3.8, 6.2, 4.0, 7.0, 4.9, 5.1, 3.2]</code>.</li>
+      <li>Recorra el vector y calcule la suma y el promedio del curso.</li>
+      <li>Encuentre la nota máxima y la mínima, indicando en qué posición está cada una.</li>
+      <li>Cuente cuántas notas están sobre el promedio (requiere un segundo recorrido).</li>
+    </ul><p><b>Recuerde:</b> no puede usar <code>sum</code>, <code>max</code> ni <code>min</code>.</p></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej2" data-title="Ejercicio 2"></div></div>
+  </div>
+</section>
+<!-- 4 BÚSQUEDAS -->
+<section class="sec" id="busquedas">
+  <h2><span class="n">4</span>Búsquedas en vectores</h2>
+  <p class="sec-sub">Determinar si un valor está en el vector y, si está, en qué posición.</p>
+  <div class="cols">
+    <div class="card"><h4>Búsqueda secuencial</h4>
+      <p style="font-size:15.5px">Revisa uno por uno, desde el inicio.</p>
+      <div class="viz" data-v='[12,5,8,21,3,17]' data-o='{"hl":{"0":"d","1":"d","2":"d","3":"m"},"noidx":true}'></div>
+      <p style="margin:10px 0 0;font-size:15px">¿Está el 21? 12, 5, 8 y en el 4° intento: 21. Sirve para cualquier vector, ordenado o no.</p></div>
+    <div class="card"><h4>Búsqueda binaria</h4>
+      <p style="font-size:15.5px">Divide por la mitad un vector ordenado.</p>
+      <div class="viz" data-v='[3,7,12,18,25,31,40,52]' data-o='{"hl":{"0":"d","1":"d","2":"d","3":"m"},"noidx":true}'></div>
+      <p style="margin:10px 0 0;font-size:15px">¿Está el 40? El medio es 18 y 18 &lt; 40: se descarta la izquierda. Mucho más rápida, pero exige que el vector esté ordenado.</p></div>
+  </div>
+
+  <h3>Búsqueda secuencial</h3>
+  <p>Revisa los elementos uno por uno, desde el inicio, hasta encontrar el valor buscado o llegar al final. Funciona aunque el vector no esté ordenado.</p>
+  <ul class="b">
+    <li><code>pos = -1</code> funciona como <b>bandera</b>: −1 significa «no encontrado», porque no es un índice válido.</li>
+    <li>Al encontrarlo guardamos el índice y salimos con <code>break</code>.</li>
+    <li>En el peor caso revisa todos los elementos.</li>
+  </ul>
+  <div class="rn-host" data-ex="sec" data-title="Ruteo: búsqueda secuencial (buscado = 21)"></div>
+  <p>En <code>i = 0</code>, <code>i = 1</code> e <code>i = 2</code> la comparación es falsa y se continúa; en <code>i = 3</code>, 21 == 21 es verdadero: <code>pos = 3</code> y <code>break</code> termina el ciclo.</p>
+
+  <div class="ej" id="ej3">
+    <div class="ej-h"><span class="num">Ejercicio 3</span><h3>Búsqueda secuencial</h3></div>
+    <div class="ej-b"><ul>
+      <li>Un almacén guarda los códigos de sus productos en el vector <code>codigos = [305, 112, 87, 450, 219, 33]</code>.</li>
+      <li>Pida al usuario un código y búsquelo con búsqueda secuencial.</li>
+      <li>Si existe, indique en qué posición está; si no, muestre «Código no registrado».</li>
+      <li><b>Desafío:</b> muestre cuántas comparaciones hizo hasta encontrarlo (o hasta terminar).</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej3" data-title="Ejercicio 3" data-presets='[["450"],["999"],["33"]]'></div></div>
+  </div>
+
+  <h3>Búsqueda binaria</h3>
+  <p>Requiere un vector <b>ordenado</b>. Compara el valor buscado con el elemento del medio: si no es, descarta la mitad donde no puede estar y repite con la otra.</p>
+  <ul class="b">
+    <li><code>izq</code> y <code>der</code> delimitan la zona donde aún puede estar el valor.</li>
+    <li><code>//</code> es división entera: el medio siempre es un índice válido.</li>
+    <li>Si <code>v[medio]</code> es menor, el valor está a la derecha; si es mayor, a la izquierda.</li>
+    <li>Si <code>izq</code> supera a <code>der</code>, el valor no está.</li>
+  </ul>
+  <div class="rn-host" data-ex="bin" data-title="Ruteo: búsqueda binaria (buscado = 40)"></div>
+  <p>Paso 1: <code>(0 + 7) // 2 = 3</code>, <code>v[3] = 18</code> es menor que 40, entonces <code>izq = 4</code>. Paso 2: <code>(4 + 7) // 2 = 5</code>, <code>v[5] = 31</code> es menor, entonces <code>izq = 6</code>. Paso 3: <code>(6 + 7) // 2 = 6</code>, <code>v[6] = 40</code> es igual al buscado: <code>pos = 6</code>. ¡Solo 3 comparaciones!</p>
+
+  <h3>Secuencial vs. binaria</h3>
+  <p>Para un vector de un millón de elementos:</p>
+  <div class="cols">
+    <div class="card"><div class="big">1.000.000</div>comparaciones como máximo con búsqueda secuencial</div>
+    <div class="card ok"><div class="big">20</div>comparaciones como máximo con búsqueda binaria</div>
+  </div>
+  <div class="tw"><table class="t">
+    <thead><tr><th></th><th>Secuencial</th><th>Binaria</th></tr></thead>
+    <tbody>
+      <tr><td>¿Requiere orden?</td><td>No</td><td>Sí</td></tr>
+      <tr><td>¿Cómo avanza?</td><td>De a un elemento</td><td>Descarta la mitad</td></tr>
+      <tr><td>Conviene cuando…</td><td>El vector es pequeño o desordenado</td><td>El vector es grande y ordenado</td></tr>
+    </tbody></table></div>
+
+  <div class="ej" id="ej4">
+    <div class="ej-h"><span class="num">Ejercicio 4</span><h3>Búsqueda binaria</h3></div>
+    <div class="ej-b"><ul>
+      <li>El vector <code>anios = [1990, 1995, 2001, 2004, 2010, 2013, 2018, 2022, 2026]</code> está ordenado.</li>
+      <li>Pida un año y búsquelo con búsqueda binaria.</li>
+      <li>En cada vuelta del ciclo muestre los valores de <code>izq</code>, <code>der</code> y <code>medio</code> (su propio ruteo).</li>
+      <li>Indique si el año está y en qué posición.</li>
+      <li><b>Pregunta:</b> ¿qué pasaría si el vector no estuviera ordenado?</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej4" data-title="Ejercicio 4" data-presets='[["2018"],["1990"],["2026"],["1999"]]'></div>
+      <div class="q"><b>Respuesta.</b> La búsqueda binaria descarta una mitad suponiendo que los valores crecen de izquierda a derecha. Si el vector estuviera desordenado, podría descartar justo la mitad donde está el valor y concluir «No está en el vector» aunque exista. Pruébalo: pulsa <b>Editar código</b>, cambia el orden de los años y busca otra vez.</div></div>
+  </div>
+</section>
+
+<!-- 5 ORDENAMIENTO -->
+<section class="sec" id="ordenamiento">
+  <h2><span class="n">5</span>Ordenamiento</h2>
+  <p class="sec-sub">Burbuja y selección, con tamaño fijo.</p>
+
+  <h3>Intercambio de dos posiciones</h3>
+  <p>Ambos ordenamientos necesitan intercambiar dos elementos. Si hacemos <code>v[0] = v[1]</code> perdemos el valor original, por eso usamos una variable auxiliar: <code>v = [5, 1]</code> pasa a ser <code>v = [1, 5]</code>.</p>
+  <div class="rn-host" data-ex="swap" data-title="Intercambio con una variable auxiliar"></div>
+
+  <h3>Ordenamiento burbuja</h3>
+  <p>Compara pares de elementos vecinos y los intercambia si están en el orden incorrecto. En cada pasada, el mayor de la zona sin ordenar «sube» hasta el final, como una burbuja.</p>
+  <ul class="b">
+    <li><code>i</code> cuenta las pasadas: se necesitan n − 1.</li>
+    <li><code>j</code> recorre los pares vecinos (<code>v[j]</code>, <code>v[j + 1]</code>).</li>
+    <li>Cada pasada deja un elemento fijo al final, por eso el <code>for</code> de <code>j</code> llega hasta <code>n - 1 - i</code>.</li>
+    <li>Para ordenar de mayor a menor basta con cambiar <code>&gt;</code> por <code>&lt;</code>.</li>
+  </ul>
+  <div class="rn-host" data-ex="burbuja" data-title="Burbuja: v = [5, 1, 4, 2, 8]"></div>
+  <h4>Primera pasada</h4>
+  <div class="strips" data-rows='[
+    {"v":[5,1,4,2,8],"hl":{"0":"b","1":"b"},"t":"j = 0: 5 > 1 → se intercambian"},
+    {"v":[1,5,4,2,8],"hl":{"1":"b","2":"b"},"t":"j = 1: 5 > 4 → se intercambian"},
+    {"v":[1,4,5,2,8],"hl":{"2":"b","3":"b"},"t":"j = 2: 5 > 2 → se intercambian"},
+    {"v":[1,4,2,5,8],"hl":{"3":"b","4":"b"},"t":"j = 3: 5 > 8 → no se intercambian"},
+    {"v":[1,4,2,5,8],"hl":{"4":"d"},"t":"Fin de la pasada: el 8 quedó en su posición final. El mayor valor llegó al final del vector."}]'></div>
+  <h4>Pasadas 2, 3 y 4</h4>
+  <div class="strips" data-rows='[
+    {"v":[1,4,2,5,8],"hl":{"0":"b","1":"b","4":"d"},"t":"i = 1, j = 0: 1 > 4 → no"},
+    {"v":[1,4,2,5,8],"hl":{"1":"b","2":"b","4":"d"},"t":"i = 1, j = 1: 4 > 2 → se intercambian"},
+    {"v":[1,2,4,5,8],"hl":{"2":"b","3":"b","4":"d"},"t":"i = 1, j = 2: 4 > 5 → no. Queda fijo el 5"},
+    {"v":[1,2,4,5,8],"hl":{"3":"d","4":"d"},"t":"i = 2, j = 0 y 1: sin intercambios. Queda fijo el 4"},
+    {"v":[1,2,4,5,8],"hl":{"0":"d","1":"d","2":"d","3":"d","4":"d"},"t":"i = 3, j = 0: 1 > 2 → no. ¡Vector ordenado! Resultado: v = [1, 2, 4, 5, 8]"}]'></div>
+
+  <h3>Ordenamiento por selección</h3>
+  <p>En cada pasada selecciona el menor de la zona sin ordenar y lo intercambia con la primera posición de esa zona. Así el vector se ordena de izquierda a derecha.</p>
+  <ul class="b">
+    <li>El <code>for</code> interno es el algoritmo del menor, pero guarda la <b>posición</b> y no el valor.</li>
+    <li>Hace un solo intercambio por pasada (burbuja puede hacer muchos).</li>
+    <li><code>v[i]</code> es el lugar donde debe quedar el menor encontrado.</li>
+  </ul>
+  <div class="rn-host" data-ex="seleccion" data-title="Selección: v = [29, 10, 14, 37, 13]"></div>
+  <div class="strips" data-rows='[
+    {"v":[29,10,14,37,13],"hl":{"0":"b","1":"m"},"t":"i = 0: el menor es 10 (pos. 1) → intercambiar v[0] y v[1]"},
+    {"v":[10,29,14,37,13],"hl":{"0":"d","1":"b","4":"m"},"t":"i = 1: el menor es 13 (pos. 4) → intercambiar v[1] y v[4]"},
+    {"v":[10,13,14,37,29],"hl":{"0":"d","1":"d","2":"b"},"t":"i = 2: el menor es 14 y ya está en su lugar"},
+    {"v":[10,13,14,37,29],"hl":{"0":"d","1":"d","2":"d","3":"b","4":"m"},"t":"i = 3: el menor es 29 (pos. 4) → intercambiar v[3] y v[4]"},
+    {"v":[10,13,14,29,37],"hl":{"0":"d","1":"d","2":"d","3":"d","4":"d"},"t":"¡Vector ordenado!"}]'></div>
+  <p class="meta">Azul: posición <code>i</code> · Magenta: menor encontrado · Oscuro: ya ordenado.</p>
+
+  <div class="ej" id="ej5">
+    <div class="ej-h"><span class="num">Ejercicio 5</span><h3>Ordenamiento</h3></div>
+    <div class="ej-b"><ul>
+      <li>Dado <code>puntajes = [42, 87, 15, 63, 90, 28]</code>:</li>
+      <li>Ordénelo de menor a mayor con el método burbuja y cuente cuántos intercambios realizó.</li>
+      <li>Partiendo del vector original, ordénelo de mayor a menor con selección y cuente los intercambios.</li>
+      <li>Muestre el vector después de cada pasada para comprobar su ruteo.</li>
+      <li><b>Pregunta:</b> ¿cuál de los dos métodos hizo menos intercambios?</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej5" data-title="Ejercicio 5"></div>
+      <div class="q"><b>Respuesta.</b> Con este vector, burbuja hizo 7 intercambios y selección solo 4. Selección hace como máximo un intercambio por pasada; burbuja intercambia cada par vecino que esté en desorden, así que puede hacer muchos más.</div></div>
+  </div>
+</section>
+<!-- 6 MATRICES -->
+<section class="sec" id="matrices">
+  <h2><span class="n">6</span>Matrices</h2>
+  <p class="sec-sub">Arreglos de dos dimensiones.</p>
+
+  <h3>¿Qué es una matriz?</h3>
+  <p>Una matriz es un arreglo de dos dimensiones: sus elementos se organizan en filas (horizontales) y columnas (verticales). Cada elemento se ubica con dos índices.</p>
+  <div class="cols">
+    <div class="card"><div class="viz" data-v='[[5,6,4,7],[3,5,6,2],[7,7,6,5]]' data-o='{"hl":{"1,*":"b","1,2":"m"},"rows":["fila 0","fila 1","fila 2"],"cols":["col 0","col 1","col 2","col 3"]}'></div></div>
+    <ul class="b">
+      <li><code>m[f][c]</code>: primero la fila, después la columna.</li>
+      <li>La fila 1 (azul) es <code>[3, 5, 6, 2]</code>.</li>
+      <li><code>m[1][2]</code> (magenta) vale 6.</li>
+      <li>Esta matriz es de 3 × 4: 3 filas y 4 columnas.</li>
+      <li>En Python es una lista de listas: cada fila es un vector.</li>
+    </ul>
+  </div>
+
+  <h3>Creación de matrices</h3>
+  <div class="cols">
+    <div><h4>Con valores conocidos</h4><p style="font-size:15px">Tamaño: <code>filas = len(m)</code> y <code>columnas = len(m[0])</code>. Acceso: <code>m[1][2]</code> lee y <code>m[0][3] = 9</code> escribe.</p>
+      <div class="rn-host" data-ex="mat-conocidos" data-title="Con valores conocidos"></div></div>
+    <div><h4>Con un tamaño fijo</h4><p style="font-size:15px">Cada fila se crea por separado, dentro de un <code>for</code>.</p>
+      <div class="rn-host" data-ex="mat-tamano" data-title="Con un tamaño fijo"></div></div>
+  </div>
+  <div class="card alert"><h4>¡Cuidado!</h4>
+    <p style="margin:0"><code>m = [[0] * 4] * 3</code> no sirve: las 3 filas serían la misma lista y al modificar una se modificarían todas. Por eso cada fila se crea por separado dentro del <code>for</code>. Míralo en la memoria: las tres filas cambian a la vez.</p></div>
+  <div class="rn-host" data-ex="mat-cuidado" data-title="El error de [[0] * 4] * 3"></div>
+
+  <div class="ej" id="ej8">
+    <div class="ej-h"><span class="num">Ejercicio 8</span><h3>Creación de matrices</h3></div>
+    <div class="ej-b"><ul>
+      <li>Cree un tablero de gato de 3 × 3 donde cada casilla sea <code>" "</code> (un espacio), usando el <code>for</code> de creación.</li>
+      <li>Pida al jugador una fila y una columna, y coloque una <code>"X"</code> en esa casilla.</li>
+      <li>Coloque una <code>"O"</code> en la esquina superior derecha usando el índice directamente.</li>
+      <li>Muestre el tablero fila por fila con <code>print(m[0])</code>, <code>print(m[1])</code> y <code>print(m[2])</code>.</li>
+      <li>Valide que la fila y la columna estén entre 0 y 2.</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej8" data-title="Ejercicio 8" data-presets='[["1","1"],["2","0"],["3","1"]]'></div></div>
+  </div>
+
+  <h3>Recorrido de matrices (doble for)</h3>
+  <p>Para visitar todos los elementos se usan dos <code>for</code> anidados: el externo recorre las filas y, por cada fila, el interno recorre todas sus columnas.</p>
+  <ul class="b">
+    <li><code>len(m)</code> = número de filas; <code>len(m[0])</code> = número de columnas.</li>
+    <li><code>end=" "</code> evita el salto de línea entre elementos de una misma fila.</li>
+    <li>El <code>print()</code> final, fuera del <code>for</code> interno, salta de línea al terminar cada fila.</li>
+  </ul>
+  <div class="rn-host" data-ex="doble-for" data-title="Ruteo: doble for"></div>
+  <p>Total de iteraciones del <code>for</code> interno: filas × columnas = 2 × 3 = 6. Con <code>f = 0</code> el interno recorre <code>c = 0, 1, 2</code> y muestra la fila 0; luego vuelve a empezar en <code>c = 0</code> para la fila 1.</p>
+
+  <h3>Ejemplo: suma de una matriz</h3>
+  <p>Es el mismo acumulador de los vectores, pero dentro de dos ciclos. Del mismo modo se pueden buscar el máximo, el mínimo o contar elementos que cumplan una condición.</p>
+  <div class="rn-host" data-ex="suma-mat" data-title="Suma de una matriz de 3 × 4"></div>
+
+  <div class="ej" id="ej9">
+    <div class="ej-h"><span class="num">Ejercicio 9</span><h3>Recorrido con doble for</h3></div>
+    <div class="ej-b"><ul>
+      <li>Una empresa registra sus ventas en una matriz de 3 sucursales (filas) × 4 meses (columnas).</li>
+      <li>Muestre la matriz en forma de tabla, una fila por línea.</li>
+      <li>Calcule el total de ventas de la empresa.</li>
+      <li>Encuentre la mayor venta e indique en qué sucursal y en qué mes ocurrió.</li>
+      <li>Cuente cuántas ventas superaron los $500.000.</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej9" data-title="Ejercicio 9"></div></div>
+  </div>
+
+  <h3>Recorrido de una fila (un for)</h3>
+  <p>Si solo nos interesa una fila, dejamos fijo el índice de la fila y recorremos sus columnas con un solo <code>for</code>. Es como recorrer un vector: <code>m[f]</code>. Para recorrer una columna se fija <code>c</code> y se recorre <code>f</code>.</p>
+  <div class="rn-host" data-ex="fila-suma" data-title="Suma de la fila 1 = 16"></div>
+
+  <div class="ej" id="ej10">
+    <div class="ej-h"><span class="num">Ejercicio 10</span><h3>Recorrido de una fila</h3></div>
+    <div class="ej-b"><ul>
+      <li>Una matriz guarda las notas de 4 estudiantes (filas) en 3 evaluaciones (columnas).</li>
+      <li>Pida el número de un estudiante (0 a 3) y calcule su promedio recorriendo solo su fila.</li>
+      <li>Indique si el estudiante aprueba (promedio ≥ 4.0).</li>
+      <li>Muestre su mejor nota recorriendo la misma fila.</li>
+      <li><b>Desafío:</b> con un <code>for</code> sobre las filas, calcule el promedio de la evaluación 2 (una columna).</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej10" data-title="Ejercicio 10" data-presets='[["2"],["0"],["1"],["5"]]'></div></div>
+  </div>
+</section>
+
+<!-- 7 INSERCIÓN Y ELIMINACIÓN -->
+<section class="sec" id="insercion">
+  <h2><span class="n">7</span>Inserción y eliminación</h2>
+  <p class="sec-sub">Sin <code>append</code> ni <code>remove</code>: con tamaño fijo y una variable <code>cantidad</code>.</p>
+
+  <h3>Vectores de tamaño fijo</h3>
+  <p>Como el tamaño no cambia, el vector tiene una <b>capacidad</b> (su tamaño) y llevamos en una variable cuántas posiciones están ocupadas.</p>
+  <div class="card"><div class="viz" data-v='[8,3,5,9,0,0]' data-o='{"name":"v","free":4,"note":"ocupadas: 0 a cantidad − 1 · libres: el resto"}'></div>
+    <p style="margin:10px 0 0;font-size:15px"><code>v = [8, 3, 5, 9, 0, 0]</code> y <code>cantidad = 4</code></p></div>
+  <ul class="b" style="margin-top:12px">
+    <li><code>len(v)</code> es la capacidad: 6 posiciones, siempre.</li>
+    <li><code>cantidad</code> indica cuántas tienen datos válidos: 4.</li>
+    <li>Insertar y eliminar no cambian el tamaño: escriben o desplazan elementos y actualizan <code>cantidad</code>.</li>
+  </ul>
+
+  <h3>Inserción al final</h3>
+  <p>Es el caso más simple: el nuevo valor se escribe en la primera posición libre, que es justamente <code>v[cantidad]</code>. No hay que mover ningún elemento.</p>
+  <ul class="b">
+    <li>Verificar que quede espacio (<code>cantidad &lt; len(v)</code>).</li>
+    <li>Escribir el valor en <code>v[cantidad]</code>.</li>
+    <li>Sumar 1 a <code>cantidad</code>.</li>
+  </ul>
+  <div class="strips" data-rows='[
+    {"v":[8,3,5,9,0,0],"free":4,"t":"Inicio: cantidad = 4"},
+    {"v":[8,3,5,9,7,0],"free":5,"hl":{"4":"m"},"t":"Insertar 7: v[4] = 7 y cantidad = 5"},
+    {"v":[8,3,5,9,7,6],"free":6,"hl":{"5":"m"},"t":"Insertar 6: v[5] = 6 y cantidad = 6"},
+    {"v":[8,3,5,9,7,6],"free":6,"t":"Insertar 2: cantidad = len(v) → Vector lleno"}]'></div>
+  <div class="rn-host" data-ex="ins-final" data-title="Inserción al final: código"></div>
+  <p><code>cantidad &lt; len(v)</code> revisa que quede al menos una posición libre; así reemplazamos a <code>append</code> respetando el tamaño fijo.</p>
+
+  <h3>Inserción entre elementos</h3>
+  <p>Ahora el valor debe quedar en una posición ocupada (<code>pos</code>), sin perder los que ya estaban. Los elementos desde <code>pos</code> se corren a la derecha para dejarle espacio.</p>
+  <ul class="b">
+    <li>Verificar que quede espacio (<code>cantidad &lt; len(v)</code>).</li>
+    <li>Correr a la derecha los elementos desde el final hasta <code>pos</code>.</li>
+    <li>Escribir el valor en <code>pos</code> y sumar 1 a <code>cantidad</code>.</li>
+  </ul>
+  <div class="strips" data-rows='[
+    {"v":[8,3,5,9,0,0],"free":4,"t":"Inicio: cantidad = 4. Insertar 7 en pos = 1"},
+    {"v":[8,3,5,9,9,0],"free":4,"hl":{"3":"b","4":"m"},"t":"i = 4: v[4] = v[3]"},
+    {"v":[8,3,5,5,9,0],"free":4,"hl":{"2":"b","3":"m"},"t":"i = 3: v[3] = v[2]"},
+    {"v":[8,3,3,5,9,0],"free":4,"hl":{"1":"b","2":"m"},"t":"i = 2: v[2] = v[1]"},
+    {"v":[8,7,3,5,9,0],"free":5,"hl":{"1":"m"},"t":"v[1] = 7 y cantidad = 5"}]'></div>
+  <p class="meta">Se recorre desde el final hacia <code>pos</code>, para no sobrescribir valores que aún no se movieron. <code>range(cantidad, pos, -1)</code> recorre hacia atrás: 4, 3, 2.</p>
+  <div class="rn-host" data-ex="ins-entre" data-title="Inserción entre elementos: código"></div>
+
+  <h3>¿Qué es eliminar?</h3>
+  <p>Eliminar es quitar el valor de una posición. Como el tamaño es fijo, no se borra la casilla: los elementos siguientes se corren a la izquierda para tapar el hueco.</p>
+  <ul class="b">
+    <li>Correr a la izquierda los elementos que están después de <code>pos</code>.</li>
+    <li>Restar 1 a <code>cantidad</code>.</li>
+    <li>Limpiar la última posición que quedó repetida (<code>v[cantidad] = 0</code>).</li>
+  </ul>
+  <div class="strips" data-rows='[
+    {"v":[8,7,3,5,9,0],"free":5,"t":"Inicio: cantidad = 5. Eliminar pos = 1"},
+    {"v":[8,3,3,5,9,0],"free":5,"hl":{"1":"m","2":"b"},"t":"i = 1: v[1] = v[2]"},
+    {"v":[8,3,5,5,9,0],"free":5,"hl":{"2":"m","3":"b"},"t":"i = 2: v[2] = v[3]"},
+    {"v":[8,3,5,9,9,0],"free":5,"hl":{"3":"m","4":"b"},"t":"i = 3: v[3] = v[4]"},
+    {"v":[8,3,5,9,0,0],"free":4,"hl":{"4":"m"},"t":"cantidad = 4 y v[4] = 0. El vector conserva su tamaño 6; solo cambió la cantidad de posiciones ocupadas"}]'></div>
+  <div class="rn-host" data-ex="eliminar" data-title="Eliminación: código"></div>
+  <p><code>range(pos, cantidad - 1)</code> recorre hacia adelante: 1, 2, 3. Para eliminar un <i>valor</i> (no una posición), primero se busca con búsqueda secuencial.</p>
+
+  <div class="ej" id="ej6">
+    <div class="ej-h"><span class="num">Ejercicio 6</span><h3>Inserción y eliminación</h3></div>
+    <div class="ej-b"><ul>
+      <li>Cree un vector de capacidad 8 con <code>[10, 20, 40, 50, 0, 0, 0, 0]</code> y <code>cantidad = 4</code>.</li>
+      <li>Agregue el 60 al final del vector.</li>
+      <li>Inserte el 30 de modo que el vector quede ordenado (primero busque la posición correcta).</li>
+      <li>Pida un valor al usuario, búsquelo y, si existe, elimínelo.</li>
+      <li>Después de cada operación muestre solo las posiciones ocupadas.</li>
+      <li>Controle los casos: vector lleno y valor inexistente.</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej6" data-title="Ejercicio 6" data-presets='[["20"],["99"],["60"],["10"]]'></div></div>
+  </div>
+</section>
+
+<!-- 8 PARALELOS -->
+<section class="sec" id="paralelos">
+  <h2><span class="n">8</span>Vectores paralelos</h2>
+  <p class="sec-sub">Varios vectores del mismo tamaño que describen a un mismo elemento, como si fueran objetos.</p>
+  <p>Son varios vectores del mismo tamaño en los que una misma posición describe a un mismo elemento. Cada vector representa un atributo.</p>
+  <div class="tw"><table class="t" aria-label="Tres vectores paralelos">
+    <thead><tr><th></th><th>pos 0</th><th style="background:var(--blue-soft);color:var(--blue)">pos 1</th><th>pos 2</th><th>pos 3</th></tr></thead>
+    <tbody>
+      <tr><td><code>nombres</code></td><td>Ana</td><td style="background:var(--blue-soft)">Luis</td><td>Sofía</td><td>Pedro</td></tr>
+      <tr><td><code>edades</code></td><td>19</td><td style="background:var(--blue-soft)">21</td><td>20</td><td>22</td></tr>
+      <tr><td><code>notas</code></td><td>6.1</td><td style="background:var(--blue-soft)">4.5</td><td>5.8</td><td>3.9</td></tr>
+    </tbody></table></div>
+  <p style="margin-top:10px">Posición 1: Luis, 21 años, nota 4.5.</p>
+  <div class="callout">Regla de oro: si se mueve un elemento en un vector, hay que moverlo en todos</div>
+
+  <h3>Creación y despliegue</h3>
+  <ul class="b">
+    <li>Un solo <code>for</code> recorre los tres vectores a la vez, porque comparten el índice <code>i</code>.</li>
+    <li><code>len(nombres)</code> sirve para todos: tienen el mismo tamaño.</li>
+  </ul>
+  <div class="rn-host" data-ex="par-crear" data-title="Tres vectores, un solo for"></div>
+
+  <h3>Operaciones</h3>
+  <div class="cols">
+    <div><h4>Buscar al mejor estudiante</h4>
+      <ul class="b" style="font-size:15.5px"><li>Se busca en el vector <code>notas</code>, pero se guarda la posición.</li><li>Con esa posición se obtiene el nombre: <code>nombres[pos_mejor]</code>.</li></ul></div>
+    <div><h4>Intercambiar al ordenar</h4>
+      <ul class="b" style="font-size:15.5px"><li>Al ordenar por nota, se compara <code>notas</code>, pero se intercambia en todos los vectores.</li><li>Si no, cada nota quedaría asociada a otro estudiante.</li></ul></div>
+  </div>
+  <div class="rn-host" data-ex="par-mejor" data-title="Buscar al mejor estudiante"></div>
+  <div class="rn-host" data-ex="par-orden" data-title="Ordenar por nota manteniendo el paralelismo"></div>
+
+  <div class="ej" id="ej7">
+    <div class="ej-h"><span class="num">Ejercicio 7</span><h3>Vectores paralelos</h3></div>
+    <div class="ej-b"><ul>
+      <li>Una tienda registra sus productos en 4 vectores paralelos de tamaño 5: <code>codigos</code>, <code>nombres</code>, <code>precios</code> y <code>stock</code>.</li>
+      <li>Liste los productos sin stock.</li>
+      <li>Pida un código y muestre el nombre y precio del producto (búsqueda secuencial).</li>
+      <li>Calcule el valor total del inventario (precio × stock de cada producto).</li>
+      <li>Ordene los productos por precio con burbuja, manteniendo el paralelismo, y despliéguelos.</li>
+    </ul></div>
+    <div class="ej-a"><h4>Resolución</h4><div class="rn-host" data-ex="ej7" data-title="Ejercicio 7" data-presets='[["104"],["101"],["999"]]'></div></div>
+  </div>
+</section>
+
+<footer class="end">
+  <div class="qm">¿Preguntas?</div>
+  <p style="margin:8px auto 0">benjamin.miranda@ce.ucn.cl</p>
+</footer>
+</div></main>
+</div>
+
+<script>
+/* Mini intérprete de Python (subconjunto del curso) con ejecución paso a paso. */
+(function (root) {
+'use strict';
+class PF { constructor(v) { this.v = v; } }
+class PRange { constructor(a, b, c) { this.start = a; this.stop = b; this.step = c; }
+  toArray() { const r = []; if (this.step > 0) for (let i = this.start; i < this.stop; i += this.step) r.push(i); else for (let i = this.start; i > this.stop; i += this.step) r.push(i); return r; } }
+class PyError extends Error { constructor(type, msg, line) { super(msg); this.pytype = type; this.line = line; } }
+let LID = 0;
+const newList = a => { a.__id = ++LID; return a; };
+const isInt = x => typeof x === 'number';
+const isNum = x => typeof x === 'number' || x instanceof PF || typeof x === 'boolean';
+const nv = x => x instanceof PF ? x.v : (x === true ? 1 : x === false ? 0 : x);
+const isFl = x => x instanceof PF;
+const tname = x => x === null ? 'NoneType' : typeof x === 'boolean' ? 'bool' : isInt(x) ? 'int' : isFl(x) ? 'float' : typeof x === 'string' ? 'str' : Array.isArray(x) ? 'list' : x instanceof PRange ? 'range' : 'object';
+
+function fRepr(v) {
+  if (Number.isNaN(v)) return 'nan'; if (!Number.isFinite(v)) return v > 0 ? 'inf' : '-inf';
+  if (Number.isInteger(v) && Math.abs(v) < 1e16) return v.toFixed(1);
+  let s = String(v); const m = s.match(/^(-?[\d.]+)e([+-])(\d+)$/);
+  if (m) s = m[1] + 'e' + m[2] + (m[3].length < 2 ? '0' + m[3] : m[3]);
+  return s;
+}
+function sRepr(s) { const q = s.includes("'") && !s.includes('"') ? '"' : "'"; return q + s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(new RegExp(q, 'g'), '\\' + q) + q; }
+function repr(x) {
+  if (x === null) return 'None'; if (x === true) return 'True'; if (x === false) return 'False';
+  if (isInt(x)) return String(x); if (isFl(x)) return fRepr(x.v); if (typeof x === 'string') return sRepr(x);
+  if (Array.isArray(x)) return '[' + x.map(repr).join(', ') + ']';
+  if (x instanceof PRange) return x.step === 1 ? `range(${x.start}, ${x.stop})` : `range(${x.start}, ${x.stop}, ${x.step})`;
+  return String(x);
+}
+const str = x => typeof x === 'string' ? x : repr(x);
+const truthy = x => x === null ? false : typeof x === 'boolean' ? x : isInt(x) ? x !== 0 : isFl(x) ? x.v !== 0 : typeof x === 'string' ? x.length > 0 : Array.isArray(x) ? x.length > 0 : true;
+const mkNum = (v, fl) => fl ? new PF(v) : v;
+function eq(a, b) {
+  if (isNum(a) && isNum(b)) return nv(a) === nv(b);
+  if (typeof a === 'string' && typeof b === 'string') return a === b;
+  if (Array.isArray(a) && Array.isArray(b)) return a.length === b.length && a.every((x, i) => eq(x, b[i]));
+  return a === b;
+}
+function cmp(op, a, b, line) {
+  if (op === '==') return eq(a, b); if (op === '!=') return !eq(a, b);
+  let x, y;
+  if (isNum(a) && isNum(b)) { x = nv(a); y = nv(b); }
+  else if (typeof a === 'string' && typeof b === 'string') { x = a; y = b; }
+  else throw new PyError('TypeError', `'${op}' not supported between instances of '${tname(a)}' and '${tname(b)}'`, line);
+  return op === '<' ? x < y : op === '>' ? x > y : op === '<=' ? x <= y : x >= y;
+}
+function arith(op, a, b, line) {
+  if (op === '+') {
+    if (typeof a === 'string' && typeof b === 'string') return a + b;
+    if (Array.isArray(a) && Array.isArray(b)) return newList(a.concat(b));
+  }
+  if (op === '*') {
+    const rep = (l, n) => { n = Math.max(0, nv(n)); let r = []; for (let i = 0; i < n; i++) r = r.concat(l); return r; };
+    if (Array.isArray(a) && isInt(b)) return newList(rep(a, b)); if (isInt(a) && Array.isArray(b)) return newList(rep(b, a));
+    if (typeof a === 'string' && isInt(b)) return b > 0 ? a.repeat(b) : ''; if (isInt(a) && typeof b === 'string') return a > 0 ? b.repeat(a) : '';
+  }
+  if (!isNum(a) || !isNum(b) || typeof a === 'boolean' && false)
+    throw new PyError('TypeError', op === '+' && (typeof a === 'string' || typeof b === 'string') ? `can only concatenate str (not "${tname(typeof a === 'string' ? b : a)}") to str` : `unsupported operand type(s) for ${op}: '${tname(a)}' and '${tname(b)}'`, line);
+  const fl = isFl(a) || isFl(b), x = nv(a), y = nv(b);
+  switch (op) {
+    case '+': return mkNum(x + y, fl); case '-': return mkNum(x - y, fl); case '*': return mkNum(x * y, fl);
+    case '/': if (y === 0) throw new PyError('ZeroDivisionError', 'division by zero', line); return new PF(x / y);
+    case '//': if (y === 0) throw new PyError('ZeroDivisionError', 'integer division or modulo by zero', line); return mkNum(Math.floor(x / y), fl);
+    case '%': if (y === 0) throw new PyError('ZeroDivisionError', 'integer modulo by zero', line); return mkNum(((x % y) + y) % y, fl);
+    case '**': { const r = Math.pow(x, y); return mkNum(r, fl || y < 0); }
+  }
+}
+function pyRound(x, n) {
+  const v = nv(x);
+  if (n === undefined) { const f = Math.floor(v), d = v - f; return d < 0.5 ? f : d > 0.5 ? f + 1 : (f % 2 === 0 ? f : f + 1); }
+  return new PF(Number(v.toFixed(nv(n))));
+}
+
+/* ---------- Tokenizer ---------- */
+const OPS = ['//=', '**', '//', '==', '!=', '<=', '>=', '+=', '-=', '*=', '/=', '%=', '+', '-', '*', '/', '%', '<', '>', '=', '(', ')', '[', ']', ',', ':', '.'];
+const KW = new Set(['and', 'or', 'not', 'if', 'elif', 'else', 'for', 'while', 'in', 'break', 'continue', 'pass', 'True', 'False', 'None']);
+function tokenize(s, line) {
+  const t = []; let i = 0;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === ' ' || c === '\t') { i++; continue; }
+    let m;
+    if ((m = /^(\d+\.\d*|\.\d+|\d+)/.exec(s.slice(i)))) { t.push({ k: 'num', v: m[1], f: m[1].includes('.'), a: i }); i += m[1].length; continue; }
+    if (c === '"' || c === "'") {
+      let j = i + 1, out = '';
+      while (j < s.length && s[j] !== c) { if (s[j] === '\\' && j + 1 < s.length) { const n = s[j + 1]; out += n === 'n' ? '\n' : n === 't' ? '\t' : n; j += 2; } else out += s[j++]; }
+      if (j >= s.length) throw new PyError('SyntaxError', 'texto sin cerrar (falta una comilla)', line);
+      t.push({ k: 'str', v: out, a: i }); i = j + 1; continue;
+    }
+    if ((m = /^[\p{L}_][\p{L}\p{N}_]*/u.exec(s.slice(i)))) { t.push({ k: KW.has(m[0]) ? 'kw' : 'name', v: m[0], a: i }); i += m[0].length; continue; }
+    const op = OPS.find(o => s.startsWith(o, i));
+    if (op) { t.push({ k: 'op', v: op, a: i }); i += op.length; continue; }
+    throw new PyError('SyntaxError', `carácter no válido: ${c}`, line);
+  }
+  return t;
+}
+
+/* ---------- Parser de expresiones ---------- */
+class EP {
+  constructor(toks, line) { this.t = toks; this.p = 0; this.line = line; }
+  peek() { return this.t[this.p]; }
+  isOp(v) { const x = this.t[this.p]; return x && x.k === 'op' && x.v === v; }
+  isKw(v) { const x = this.t[this.p]; return x && x.k === 'kw' && x.v === v; }
+  err(m) { return new PyError('SyntaxError', m, this.line); }
+  expectOp(v) { if (!this.isOp(v)) throw this.err(`se esperaba '${v}'`); this.p++; }
+  expr() { return this.or(); }
+  or() { let l = this.and(); while (this.isKw('or')) { this.p++; l = { t: 'or', l, r: this.and() }; } return l; }
+  and() { let l = this.not(); while (this.isKw('and')) { this.p++; l = { t: 'and', l, r: this.not() }; } return l; }
+  not() { if (this.isKw('not')) { this.p++; return { t: 'not', e: this.not() }; } return this.comp(); }
+  comp() {
+    const first = this.arith(); const ops = [], rest = [];
+    while (this.peek() && this.peek().k === 'op' && ['==', '!=', '<', '>', '<=', '>='].includes(this.peek().v)) { ops.push(this.peek().v); this.p++; rest.push(this.arith()); }
+    return ops.length ? { t: 'cmp', first, ops, rest } : first;
+  }
+  arith() { let l = this.term(); while (this.isOp('+') || this.isOp('-')) { const op = this.peek().v; this.p++; l = { t: 'bin', op, l, r: this.term() }; } return l; }
+  term() { let l = this.unary(); while (this.isOp('*') || this.isOp('/') || this.isOp('//') || this.isOp('%')) { const op = this.peek().v; this.p++; l = { t: 'bin', op, l, r: this.unary() }; } return l; }
+  unary() { if (this.isOp('-')) { this.p++; return { t: 'neg', e: this.unary() }; } if (this.isOp('+')) { this.p++; return this.unary(); } return this.pow(); }
+  pow() { const b = this.post(); if (this.isOp('**')) { this.p++; return { t: 'bin', op: '**', l: b, r: this.unary() }; } return b; }
+  post() {
+    let e = this.atom();
+    for (;;) {
+      if (this.isOp('[')) { this.p++; const idx = this.expr(); this.expectOp(']'); e = { t: 'sub', obj: e, idx, line: this.line }; }
+      else if (this.isOp('(')) {
+        this.p++; const args = [], kw = {};
+        while (!this.isOp(')')) {
+          if (this.peek() && this.peek().k === 'name' && this.t[this.p + 1] && this.t[this.p + 1].v === '=' && this.t[this.p + 1].k === 'op') { const n = this.peek().v; this.p += 2; kw[n] = this.expr(); }
+          else args.push(this.expr());
+          if (this.isOp(',')) this.p++; else break;
+        }
+        this.expectOp(')'); e = { t: 'call', fn: e, args, kw, line: this.line };
+      } else if (this.isOp('.')) throw this.err('en este curso no se usan métodos con punto (append, remove, index…)');
+      else break;
+    }
+    return e;
+  }
+  atom() {
+    const x = this.peek(); if (!x) throw this.err('la expresión está incompleta');
+    if (x.k === 'num') { this.p++; return { t: 'num', v: x.f ? new PF(parseFloat(x.v)) : parseInt(x.v, 10) }; }
+    if (x.k === 'str') { this.p++; return { t: 'str', v: x.v }; }
+    if (x.k === 'kw' && (x.v === 'True' || x.v === 'False' || x.v === 'None')) { this.p++; return { t: 'const', v: x.v === 'True' ? true : x.v === 'False' ? false : null }; }
+    if (x.k === 'name') { this.p++; return { t: 'name', n: x.v, line: this.line }; }
+    if (this.isOp('(')) { this.p++; const e = this.expr(); this.expectOp(')'); return e; }
+    if (this.isOp('[')) { this.p++; const items = []; while (!this.isOp(']')) { items.push(this.expr()); if (this.isOp(',')) this.p++; else break; } this.expectOp(']'); return { t: 'list', items }; }
+    throw this.err(`símbolo inesperado: ${x.v}`);
+  }
+}
+
+/* ---------- Parser de sentencias ---------- */
+function splitLines(src) {
+  const raw = src.replace(/\r/g, '').split('\n'), lines = [];
+  let cur = null, depth = 0;
+  raw.forEach((ln, idx) => {
+    let out = '', q = null;
+    for (let i = 0; i < ln.length; i++) {
+      const c = ln[i];
+      if (q) { out += c; if (c === '\\') { out += ln[++i] || ''; } else if (c === q) q = null; continue; }
+      if (c === '#') break;
+      if (c === '"' || c === "'") q = c;
+      if ('([{'.includes(c)) depth++; if (')]}'.includes(c)) depth--;
+      out += c;
+    }
+    if (cur) { cur.text += ' ' + out.trim(); }
+    else if (out.trim()) { const ind = out.match(/^[ \t]*/)[0].replace(/\t/g, '    ').length; cur = { indent: ind, text: out.trim(), no: idx + 1 }; }
+    if (cur && depth <= 0) { lines.push(cur); cur = null; depth = 0; }
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+function parse(src) {
+  const L = splitLines(src); let i = 0;
+  function block(indent) {
+    const out = [];
+    while (i < L.length) {
+      const ln = L[i];
+      if (ln.indent < indent) break;
+      if (ln.indent > indent) throw new PyError('IndentationError', 'sangría inesperada', ln.no);
+      out.push(stmt(indent));
+    }
+    return out;
+  }
+  function body(ind, no, what) {
+    if (i >= L.length || L[i].indent <= ind) throw new PyError('IndentationError', `después de '${what}:' se esperaba un bloque con sangría`, no);
+    return block(L[i].indent);
+  }
+  function stmt(indent) {
+    const ln = L[i], toks = tokenize(ln.text, ln.no), no = ln.no, f = toks[0];
+    const header = () => { if (!toks.length || toks[toks.length - 1].v !== ':' ) throw new PyError('SyntaxError', "falta ':' al final de la línea", no); return toks.slice(1, -1); };
+    if (f.k === 'kw' && (f.v === 'if' || f.v === 'elif')) return ifStmt(indent);
+    if (f.k === 'kw' && (f.v === 'else')) throw new PyError('SyntaxError', "'else' sin su 'if'", no);
+    if (f.k === 'kw' && f.v === 'while') {
+      const ht = header(), p = new EP(ht, no), test = p.expr(); if (p.p < ht.length) throw p.err('condición no válida'); i++;
+      return { t: 'while', line: no, text: ln.text, test, body: body(indent, no, 'while') };
+    }
+    if (f.k === 'kw' && f.v === 'for') {
+      const ht = header();
+      if (!ht[0] || ht[0].k !== 'name' || !ht[1] || ht[1].v !== 'in') throw new PyError('SyntaxError', "se esperaba 'for variable in …:'", no);
+      const p = new EP(ht.slice(2), no), iter = p.expr(); if (p.p < ht.length - 2) throw p.err('iterable no válido'); i++;
+      return { t: 'for', line: no, text: ln.text, v: ht[0].v, iter, body: body(indent, no, 'for') };
+    }
+    if (f.k === 'kw' && (f.v === 'break' || f.v === 'continue' || f.v === 'pass')) { i++; return { t: f.v, line: no, text: ln.text }; }
+    // asignación / expresión
+    let dp = 0; const ei = toks.findIndex(x => { if (x.k === 'op') { if ('([{'.includes(x.v)) dp++; else if (')]}'.includes(x.v)) dp--; else if (dp === 0 && ['=', '+=', '-=', '*=', '/=', '//=', '%='].includes(x.v)) return true; } return false; });
+    i++;
+    if (ei > 0) {
+      const tp = new EP(toks.slice(0, ei), no), target = tp.expr();
+      if (target.t !== 'name' && target.t !== 'sub') throw new PyError('SyntaxError', 'no se puede asignar a esa expresión', no);
+      const vp = new EP(toks.slice(ei + 1), no), value = vp.expr(); if (vp.p < vp.t.length) throw vp.err('expresión no válida');
+      return { t: 'assign', line: no, text: ln.text, op: toks[ei].v, target, value };
+    }
+    const p = new EP(toks, no), e = p.expr(); if (p.p < toks.length) throw p.err('instrucción no válida');
+    return { t: 'expr', line: no, text: ln.text, e };
+  }
+  function ifStmt(indent) {
+    const ln = L[i], toks = tokenize(ln.text, ln.no), no = ln.no, ht = toks.slice(1, -1);
+    if (toks[toks.length - 1].v !== ':') throw new PyError('SyntaxError', "falta ':' al final de la línea", no);
+    const p = new EP(ht, no), test = p.expr(); if (p.p < ht.length) throw p.err('condición no válida'); i++;
+    const node = { t: 'if', line: no, text: ln.text, test, body: body(indent, no, toks[0].v), orelse: [] };
+    if (i < L.length && L[i].indent === indent) {
+      const nt = tokenize(L[i].text, L[i].no);
+      if (nt[0].v === 'elif') node.orelse = [ifStmt(indent)];
+      else if (nt[0].v === 'else') { if (nt[1] && nt[1].v === ':' && nt.length === 2) { const eno = L[i].no; i++; node.orelse = body(indent, eno, 'else'); node.elseLine = eno; } else throw new PyError('SyntaxError', "se esperaba 'else:'", L[i].no); }
+    }
+    return node;
+  }
+  const prog = block(L.length ? L[0].indent : 0);
+  if (i < L.length) throw new PyError('IndentationError', 'sangría inesperada', L[i].no);
+  return prog;
+}
+
+/* ---------- Máquina de ejecución ---------- */
+class Machine {
+  constructor(inputs, maxSteps) { this.env = new Map(); this.out = ''; this.inputs = inputs.slice(); this.acc = { r: [], w: [] }; this.maxSteps = maxSteps || 6000; this.steps = 0; }
+  cell(list, idx, kind) { if (list.__id) this.acc[kind].push({ id: list.__id, i: idx }); }
+  ev(n) {
+    switch (n.t) {
+      case 'num': case 'str': case 'const': return n.v;
+      case 'name': { if (!this.env.has(n.n)) { if (BUILTINS[n.n]) return { builtin: n.n }; throw new PyError('NameError', `name '${n.n}' is not defined`, n.line); } return this.env.get(n.n); }
+      case 'list': return newList(n.items.map(e => this.ev(e)));
+      case 'neg': { const v = this.ev(n.e); if (!isNum(v)) throw new PyError('TypeError', `bad operand type for unary -: '${tname(v)}'`, 0); return isFl(v) ? new PF(-v.v) : -nv(v); }
+      case 'not': return !truthy(this.ev(n.e));
+      case 'and': { const l = this.ev(n.l); return truthy(l) ? this.ev(n.r) : l; }
+      case 'or': { const l = this.ev(n.l); return truthy(l) ? l : this.ev(n.r); }
+      case 'bin': return arith(n.op, this.ev(n.l), this.ev(n.r), this.line);
+      case 'cmp': { let a = this.ev(n.first); for (let k = 0; k < n.ops.length; k++) { const b = this.ev(n.rest[k]); if (!cmp(n.ops[k], a, b, this.line)) return false; a = b; } return true; }
+      case 'sub': {
+        const o = this.ev(n.obj), ix = this.ev(n.idx);
+        if (Array.isArray(o) || typeof o === 'string') {
+          if (!isInt(ix)) throw new PyError('TypeError', `list indices must be integers, not ${tname(ix)}`, this.line);
+          const j = ix < 0 ? ix + o.length : ix;
+          if (j < 0 || j >= o.length) throw new PyError('IndexError', Array.isArray(o) ? 'list index out of range' : 'string index out of range', this.line);
+          if (Array.isArray(o)) this.cell(o, j, 'r'); return o[j];
+        }
+        throw new PyError('TypeError', `'${tname(o)}' object is not subscriptable`, this.line);
+      }
+      case 'call': return this.call(n);
+    }
+    throw new PyError('SyntaxError', 'expresión no soportada', this.line);
+  }
+  call(n) {
+    const f = this.ev(n.fn);
+    if (!f || !f.builtin) throw new PyError('TypeError', `'${tname(f)}' object is not callable`, this.line);
+    const args = n.args.map(a => this.ev(a)), kw = {}; for (const k in n.kw) kw[k] = this.ev(n.kw[k]);
+    return BUILTINS[f.builtin](this, args, kw);
+  }
+  assign(t, val) {
+    if (t.t === 'name') { this.env.set(t.n, val); return t.n; }
+    const o = this.ev(t.obj), ix = this.ev(t.idx);
+    if (!Array.isArray(o)) throw new PyError('TypeError', `'${tname(o)}' object does not support item assignment`, this.line);
+    if (!isInt(ix)) throw new PyError('TypeError', `list indices must be integers, not ${tname(ix)}`, this.line);
+    const j = ix < 0 ? ix + o.length : ix;
+    if (j < 0 || j >= o.length) throw new PyError('IndexError', 'list assignment index out of range', this.line);
+    o[j] = val; this.cell(o, j, 'w');
+    return this.text(t.obj) + '[' + j + ']';
+  }
+  text(n) { return n.t === 'name' ? n.n : n.t === 'sub' ? this.text(n.obj) + '[' + repr(this.ev(n.idx)) + ']' : '…'; }
+  event(line, desc, extra) {
+    if (++this.steps > this.maxSteps) throw new PyError('RuntimeError', 'el programa realizó demasiados pasos (¿ciclo infinito?)', line);
+    const e = Object.assign({ line, desc, r: this.acc.r, w: this.acc.w }, extra || {}); this.acc = { r: [], w: [] }; return e;
+  }
+  * block(stmts) { for (const s of stmts) { const sig = yield* this.stmt(s); if (sig) return sig; } }
+  * stmt(s) {
+    this.line = s.line;
+    switch (s.t) {
+      case 'assign': {
+        let v = this.ev(s.value);
+        if (s.op !== '=') { const cur = this.ev(s.target); v = arith(s.op.slice(0, -1), cur, v, s.line); }
+        const tx = this.assign(s.target, v);
+        yield this.event(s.line, `${tx} = ${repr(v)}`); return;
+      }
+      case 'expr': {
+        const o0 = this.out.length; this.ev(s.e);
+        const shown = this.out.slice(o0);
+        yield this.event(s.line, shown ? 'Muestra: ' + shown.replace(/\n$/, '') : 'Se ejecuta la instrucción'); return;
+      }
+      case 'if': {
+        const r = truthy(this.ev(s.test)); let d = s.text.replace(/:$/, '');
+        const tt = s.test.t === 'cmp' && s.test.ops.length === 1 ? `${repr(this.ev(s.test.first))} ${s.test.ops[0]} ${repr(this.ev(s.test.rest[0]))}` : null;
+        this.acc.r = this.acc.r.concat([]); // keep
+        yield this.event(s.line, (tt ? tt : d.replace(/^(if|elif)\s+/, '')) + ' → ' + (r ? 'Verdadero' : 'Falso'), { test: r });
+        if (r) return yield* this.block(s.body);
+        if (s.orelse.length) return yield* this.block(s.orelse); return;
+      }
+      case 'while': {
+        for (;;) {
+          this.line = s.line; const r = truthy(this.ev(s.test));
+          const tt = s.test.t === 'cmp' && s.test.ops.length === 1 ? `${repr(this.ev(s.test.first))} ${s.test.ops[0]} ${repr(this.ev(s.test.rest[0]))}` : s.text.replace(/^while\s+|:$/g, '');
+          yield this.event(s.line, tt + ' → ' + (r ? 'Verdadero: se repite el ciclo' : 'Falso: termina el ciclo'), { test: r });
+          if (!r) return;
+          const sig = yield* this.block(s.body); if (sig === 'break') return;
+        }
+      }
+      case 'for': {
+        const it = this.ev(s.iter); const arr = it instanceof PRange ? it.toArray() : Array.isArray(it) ? it.slice() : typeof it === 'string' ? it.split('') : null;
+        if (!arr) throw new PyError('TypeError', `'${tname(it)}' object is not iterable`, s.line);
+        for (const x of arr) {
+          this.line = s.line; this.env.set(s.v, x);
+          yield this.event(s.line, `${s.v} = ${repr(x)}`);
+          const sig = yield* this.block(s.body); if (sig === 'break') return;
+        }
+        yield this.event(s.line, 'El ciclo terminó: no quedan valores'); return;
+      }
+      case 'break': yield this.event(s.line, 'break: se sale del ciclo'); return 'break';
+      case 'continue': yield this.event(s.line, 'continue: pasa a la siguiente vuelta'); return 'continue';
+      case 'pass': yield this.event(s.line, 'pass: no hace nada'); return;
+    }
+  }
+}
+const BUILTINS = {
+  print(m, args, kw) { const sep = kw.sep !== undefined ? str(kw.sep) : ' ', end = kw.end !== undefined ? str(kw.end) : '\n'; m.out += args.map(str).join(sep) + end; return null; },
+  input(m, args) {
+    const p = args.length ? str(args[0]) : ''; m.out += p;
+    if (!m.inputs.length) throw new PyError('EOFError', 'no hay más datos de entrada: agrega valores en el recuadro "Datos de entrada"', m.line);
+    const v = m.inputs.shift(); m.out += v + '\n'; return v;
+  },
+  len(m, a) { const x = a[0]; if (Array.isArray(x) || typeof x === 'string') return x.length; if (x instanceof PRange) return x.toArray().length; throw new PyError('TypeError', `object of type '${tname(x)}' has no len()`, m.line); },
+  range(m, a) { if (!a.length || a.some(x => !isInt(x))) throw new PyError('TypeError', 'range() necesita números enteros', m.line); if (a.length === 1) return new PRange(0, a[0], 1); if (a.length === 2) return new PRange(a[0], a[1], 1); if (a[2] === 0) throw new PyError('ValueError', 'range() arg 3 must not be zero', m.line); return new PRange(a[0], a[1], a[2]); },
+  int(m, a) {
+    const x = a[0]; if (isInt(x)) return x; if (typeof x === 'boolean') return x ? 1 : 0; if (isFl(x)) return Math.trunc(x.v);
+    if (typeof x === 'string') { const t = x.trim(); if (/^[+-]?\d+$/.test(t)) return parseInt(t, 10); throw new PyError('ValueError', `invalid literal for int() with base 10: ${sRepr(x)}`, m.line); }
+    throw new PyError('TypeError', `int() argument must be a string or a number, not '${tname(x)}'`, m.line);
+  },
+  float(m, a) {
+    const x = a[0]; if (isNum(x)) return new PF(nv(x));
+    if (typeof x === 'string') { const t = x.trim().replace(',', '.'); if (/^[+-]?(\d+\.?\d*|\.\d+)$/.test(t)) return new PF(parseFloat(t)); throw new PyError('ValueError', `could not convert string to float: ${sRepr(x)}`, m.line); }
+    throw new PyError('TypeError', `float() argument must be a string or a number, not '${tname(x)}'`, m.line);
+  },
+  str(m, a) { return str(a[0]); },
+  round(m, a) { return pyRound(a[0], a[1]); },
+  abs(m, a) { const x = a[0]; return isFl(x) ? new PF(Math.abs(x.v)) : Math.abs(nv(x)); },
+};
+
+function run(src, inputs, maxSteps) {
+  const m = new Machine(inputs || [], maxSteps), steps = [];
+  const view = x => {
+    if (x === null) return { k: 'none', v: 'None' }; if (typeof x === 'boolean') return { k: 'bool', v: repr(x) };
+    if (isInt(x)) return { k: 'int', v: String(x) }; if (isFl(x)) return { k: 'float', v: repr(x) };
+    if (typeof x === 'string') return { k: 'str', v: x }; if (Array.isArray(x)) return { k: 'list', id: x.__id, items: x.map(view) };
+    if (x instanceof PRange) return { k: 'range', v: repr(x) }; return { k: 'obj', v: repr(x) };
+  };
+  const snap = () => { const o = {}; for (const [k, v] of m.env) o[k] = view(v); return o; };
+  let error = null, prog;
+  steps.push({ line: 0, desc: 'Inicio del programa', vars: {}, outLen: 0, r: [], w: [] });
+  try {
+    prog = parse(src);
+    const g = m.block(prog);
+    for (let r = g.next(); !r.done; r = g.next()) { const e = r.value; e.vars = snap(); e.outLen = m.out.length; steps.push(e); }
+  } catch (e) {
+    if (!(e instanceof PyError)) throw e;
+    error = { type: e.pytype, msg: e.message, line: e.line || m.line || 0 };
+    if (e.pytype !== 'SyntaxError' && e.pytype !== 'IndentationError') steps.push({ line: error.line, desc: `Error: ${e.pytype}`, vars: snap(), outLen: m.out.length, r: [], w: [], error });
+  }
+  if (!error) steps.push({ line: 0, desc: 'Fin del programa', vars: snap(), outLen: m.out.length, r: [], w: [], end: true });
+  return { steps, out: m.out, error };
+}
+const api = { run, parse, repr, PF };
+if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PyMini = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Programas de la presentación: ejemplos y resoluciones. */
+var PROGRAMS = {
+'problema-arreglo': { code: `notas = [0.0] * 5            # con 40 notas solo cambia este número
+for i in range(len(notas)):
+    notas[i] = float(input("Nota " + str(i + 1) + ": "))
+suma = 0
+mayor = notas[0]
+for i in range(len(notas)):
+    suma = suma + notas[i]
+    if notas[i] > mayor:
+        mayor = notas[i]
+print("Promedio:", round(suma / len(notas), 2))
+print("Nota más alta:", mayor)`, inputs: ['5.5', '6.0', '4.2', '3.9', '6.8'] },
+'crea-conocidos': { code: `notas = [5.5, 6.0, 4.2, 7.0]
+print(notas)
+print(len(notas))` },
+'crea-llenado': { code: `v = [0, 0, 0, 0, 0]
+for i in range(len(v)):
+    v[i] = int(input("Valor: "))
+print(v)`, inputs: ['3', '8', '1', '6', '4'] },
+'acceso': { code: `v = [10, 20, 30, 40]
+x = v[2]          # lectura: x = 30
+v[2] = 35         # escritura
+ultimo = v[len(v) - 1]
+print(x, v, ultimo)` },
+'acceso-error': { code: `v = [10, 20, 30, 40]
+print(v[3])
+print(v[4])       # no existe: el vector tiene índices 0 a 3`, },
+'len': { code: `v = [10, 20, 30, 40]
+print(len(v))
+print(v[len(v) - 1])
+print(range(len(v)))` },
+'despl-completo': { code: `v = [10, 20, 30, 40]
+print(v)` },
+'despl-elem': { code: `v = [10, 20, 30, 40]
+for i in range(len(v)):
+    print("v[", i, "] =", v[i])` },
+'ej1': { code: `temp = [0, 0, 0, 0, 0]
+for i in range(len(temp)):
+    temp[i] = int(input("Temperatura: "))
+print("Primera:", temp[0], "Última:", temp[len(temp) - 1])
+temp[2] = int(input("Nuevo valor pos. 2: "))
+for i in range(len(temp)):
+    print("Pos", i, ":", temp[i])`, inputs: ['18', '21', '25', '19', '16', '23'] },
+'rec-ruteo': { code: `v = [4, 9, 2, 7]
+for i in range(len(v)):
+    print("Posición", i, ":", v[i])` },
+'suma-prom': { code: `v = [4, 9, 2, 7]
+suma = 0
+for i in range(len(v)):
+    suma = suma + v[i]
+promedio = suma / len(v)
+print("Suma:", suma)
+print("Promedio:", promedio)` },
+'maxmin': { code: `v = [4, 9, 2, 7]
+mayor = v[0]
+pos_mayor = 0
+menor = v[0]
+pos_menor = 0
+for i in range(1, len(v)):
+    if v[i] > mayor:
+        mayor = v[i]
+        pos_mayor = i
+    if v[i] < menor:
+        menor = v[i]
+        pos_menor = i
+print("Mayor:", mayor, "en la posición", pos_mayor)
+print("Menor:", menor, "en la posición", pos_menor)` },
+'ej2': { code: `notas = [5.5, 3.8, 6.2, 4.0, 7.0, 4.9, 5.1, 3.2]
+suma = 0
+for i in range(len(notas)):
+    suma = suma + notas[i]
+promedio = suma / len(notas)
+
+mayor = notas[0]
+pos_mayor = 0
+menor = notas[0]
+pos_menor = 0
+for i in range(1, len(notas)):
+    if notas[i] > mayor:
+        mayor = notas[i]
+        pos_mayor = i
+    if notas[i] < menor:
+        menor = notas[i]
+        pos_menor = i
+
+sobre = 0                       # segundo recorrido
+for i in range(len(notas)):
+    if notas[i] > promedio:
+        sobre = sobre + 1
+
+print("Suma:", round(suma, 1))
+print("Promedio:", round(promedio, 2))
+print("Máxima:", mayor, "(pos.", str(pos_mayor) + ")")
+print("Mínima:", menor, "(pos.", str(pos_menor) + ")")
+print("Sobre el promedio:", sobre)` },
+'sec': { code: `v = [12, 5, 8, 21, 3, 17]
+buscado = 21
+pos = -1
+for i in range(len(v)):
+    if v[i] == buscado:
+        pos = i
+        break
+if pos != -1:
+    print("Está en la posición", pos)
+else:
+    print("No se encontró")` },
+'ej3': { code: `codigos = [305, 112, 87, 450, 219, 33]
+buscado = int(input("Código: "))
+pos = -1
+comparaciones = 0
+for i in range(len(codigos)):
+    comparaciones = comparaciones + 1
+    if codigos[i] == buscado:
+        pos = i
+        break
+if pos != -1:
+    print("Encontrado en la posición", pos)
+else:
+    print("Código no registrado")
+print("Comparaciones:", comparaciones)`, inputs: ['450'] },
+'bin': { code: `v = [3, 7, 12, 18, 25, 31, 40, 52]
+buscado = 40
+izq = 0
+der = len(v) - 1
+pos = -1
+while izq <= der and pos == -1:
+    medio = (izq + der) // 2
+    if v[medio] == buscado:
+        pos = medio
+    elif v[medio] < buscado:
+        izq = medio + 1
+    else:
+        der = medio - 1
+print("Posición:", pos)` },
+'ej4': { code: `anios = [1990, 1995, 2001, 2004, 2010, 2013, 2018, 2022, 2026]
+buscado = int(input("Año: "))
+izq = 0
+der = len(anios) - 1
+pos = -1
+while izq <= der and pos == -1:
+    medio = (izq + der) // 2
+    print("izq=" + str(izq), "der=" + str(der), "medio=" + str(medio))
+    if anios[medio] == buscado:
+        pos = medio
+    elif anios[medio] < buscado:
+        izq = medio + 1
+    else:
+        der = medio - 1
+if pos != -1:
+    print("Está en la posición", pos)
+else:
+    print("No está en el vector")`, inputs: ['2018'] },
+'swap': { code: `v = [5, 1]
+aux = v[0]
+v[0] = v[1]
+v[1] = aux
+print(v)` },
+'burbuja': { code: `v = [5, 1, 4, 2, 8]
+n = len(v)
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        if v[j] > v[j + 1]:
+            aux = v[j]
+            v[j] = v[j + 1]
+            v[j + 1] = aux
+print(v)` },
+'seleccion': { code: `v = [29, 10, 14, 37, 13]
+n = len(v)
+for i in range(n - 1):
+    pos_menor = i
+    for j in range(i + 1, n):
+        if v[j] < v[pos_menor]:
+            pos_menor = j
+    aux = v[i]
+    v[i] = v[pos_menor]
+    v[pos_menor] = aux
+print(v)` },
+'ej5': { code: `puntajes = [42, 87, 15, 63, 90, 28]
+
+# Burbuja: de menor a mayor
+b = [0] * len(puntajes)         # copia para no perder el original
+for i in range(len(puntajes)):
+    b[i] = puntajes[i]
+n = len(b)
+cambios_b = 0
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        if b[j] > b[j + 1]:
+            aux = b[j]
+            b[j] = b[j + 1]
+            b[j + 1] = aux
+            cambios_b = cambios_b + 1
+    print("Pasada " + str(i + 1) + ":", b)
+print("Burbuja:", cambios_b, "intercambios")
+
+# Selección: de mayor a menor
+s = [0] * len(puntajes)
+for i in range(len(puntajes)):
+    s[i] = puntajes[i]
+cambios_s = 0
+for i in range(n - 1):
+    pos_mayor = i
+    for j in range(i + 1, n):
+        if s[j] > s[pos_mayor]:
+            pos_mayor = j
+    if pos_mayor != i:
+        aux = s[i]
+        s[i] = s[pos_mayor]
+        s[pos_mayor] = aux
+        cambios_s = cambios_s + 1
+    print("Pasada " + str(i + 1) + ":", s)
+print("Selección:", cambios_s, "intercambios")
+if cambios_s < cambios_b:
+    print("Selección hizo menos intercambios")
+else:
+    print("Burbuja hizo menos intercambios")` },
+'mat-conocidos': { code: `m = [[5, 6, 4, 7],
+     [3, 5, 6, 2],
+     [7, 7, 6, 5]]
+filas = len(m)
+columnas = len(m[0])
+x = m[1][2]           # lectura: 6
+m[0][3] = 9           # escritura
+print(filas, columnas, x)
+print(m)` },
+'mat-tamano': { code: `filas = 3
+columnas = 4
+m = [0] * filas
+for f in range(filas):
+    m[f] = [0] * columnas
+m[0][3] = 9
+print(m)` },
+'mat-cuidado': { code: `m = [[0] * 4] * 3     # ¡las 3 filas son LA MISMA lista!
+m[0][3] = 9
+print(m)` },
+'ej8': { code: `m = [0] * 3
+for f in range(3):
+    m[f] = [" "] * 3
+fila = int(input("Fila: "))
+columna = int(input("Columna: "))
+if fila >= 0 and fila <= 2 and columna >= 0 and columna <= 2:
+    m[fila][columna] = "X"
+else:
+    print("Posición fuera del tablero")
+m[0][2] = "O"
+print(m[0])
+print(m[1])
+print(m[2])`, inputs: ['1', '1'] },
+'doble-for': { code: `m = [[1, 2, 3],
+     [4, 5, 6]]
+for f in range(len(m)):
+    for c in range(len(m[0])):
+        print(m[f][c], end=" ")
+    print()` },
+'suma-mat': { code: `m = [[5, 6, 4, 7],
+     [3, 5, 6, 2],
+     [7, 7, 6, 5]]
+suma = 0
+for f in range(len(m)):
+    for c in range(len(m[0])):
+        suma = suma + m[f][c]
+print("Total:", suma)` },
+'ej9': { code: `ventas = [[420000, 515000, 380000, 610000],
+          [300000, 450000, 520000, 490000],
+          [700000, 380000, 410000, 395000]]
+total = 0
+mayor = ventas[0][0]
+suc_mayor = 0
+mes_mayor = 0
+sobre = 0
+for f in range(len(ventas)):
+    for c in range(len(ventas[0])):
+        print(ventas[f][c], end=" ")
+        total = total + ventas[f][c]
+        if ventas[f][c] > mayor:
+            mayor = ventas[f][c]
+            suc_mayor = f
+            mes_mayor = c
+        if ventas[f][c] > 500000:
+            sobre = sobre + 1
+    print()
+print("Total:", total)
+print("Mayor:", mayor, "(sucursal " + str(suc_mayor) + ", mes " + str(mes_mayor) + ")")
+print("Sobre $500.000:", sobre)` },
+'fila-suma': { code: `m = [[5, 6, 4, 7],
+     [3, 5, 6, 2],
+     [7, 7, 6, 5]]
+f = 1
+suma = 0
+for c in range(len(m[f])):
+    suma = suma + m[f][c]
+print("Suma de la fila", f, "=", suma)` },
+'ej10': { code: `notas = [[4.5, 5.0, 6.0],
+         [3.0, 4.0, 3.5],
+         [5.0, 3.5, 6.1],
+         [6.5, 6.0, 7.0]]
+est = int(input("Estudiante: "))
+if est >= 0 and est <= 3:
+    print("Notas:", end=" ")
+    suma = 0
+    for c in range(len(notas[est])):
+        print(notas[est][c], end=" ")
+        suma = suma + notas[est][c]
+    print()
+    promedio = suma / len(notas[est])
+    print("Promedio:", round(promedio, 2))
+    if promedio >= 4.0:
+        print("Aprueba")
+    else:
+        print("Reprueba")
+    mejor = notas[est][0]
+    for c in range(1, len(notas[est])):
+        if notas[est][c] > mejor:
+            mejor = notas[est][c]
+    print("Mejor nota:", mejor)
+    # Desafío: promedio de la evaluación 2 (una columna)
+    suma_col = 0
+    for f in range(len(notas)):
+        suma_col = suma_col + notas[f][2]
+    print("Promedio evaluación 2:", round(suma_col / len(notas), 2))
+else:
+    print("Estudiante inexistente")`, inputs: ['2'] },
+'ins-final': { code: `v = [8, 3, 5, 9, 0, 0]
+cantidad = 4
+valor = 7
+if cantidad < len(v):
+    v[cantidad] = valor
+    cantidad = cantidad + 1
+else:
+    print("Vector lleno")
+print(v, cantidad)` },
+'ins-entre': { code: `v = [8, 3, 5, 9, 0, 0]
+cantidad = 4
+pos = 1
+valor = 7
+if cantidad < len(v):
+    for i in range(cantidad, pos, -1):
+        v[i] = v[i - 1]
+    v[pos] = valor
+    cantidad = cantidad + 1
+else:
+    print("Vector lleno")
+print(v, cantidad)` },
+'eliminar': { code: `v = [8, 7, 3, 5, 9, 0]
+cantidad = 5
+pos = 1
+for i in range(pos, cantidad - 1):
+    v[i] = v[i + 1]
+cantidad = cantidad - 1
+v[cantidad] = 0
+print(v, cantidad)` },
+'ej6': { code: `v = [10, 20, 40, 50, 0, 0, 0, 0]
+cantidad = 4
+
+# 1) Agregar el 60 al final
+if cantidad < len(v):
+    v[cantidad] = 60
+    cantidad = cantidad + 1
+else:
+    print("Vector lleno")
+
+# 2) Insertar el 30 manteniendo el orden
+valor = 30
+if cantidad < len(v):
+    pos = cantidad                      # por defecto, al final
+    for i in range(cantidad - 1, -1, -1):
+        if v[i] > valor:
+            pos = i                     # última posición cuyo valor es mayor
+    for i in range(cantidad, pos, -1):
+        v[i] = v[i - 1]
+    v[pos] = valor
+    cantidad = cantidad + 1
+else:
+    print("Vector lleno")
+print("Después de insertar:")
+for i in range(cantidad):
+    print(v[i], end=" ")
+print()
+
+# 3) Eliminar un valor pedido al usuario
+x = int(input("Valor a eliminar: "))
+pos = -1
+for i in range(cantidad):
+    if v[i] == x:
+        pos = i
+        break
+if pos == -1:
+    print("No existe")
+else:
+    for i in range(pos, cantidad - 1):
+        v[i] = v[i + 1]
+    cantidad = cantidad - 1
+    v[cantidad] = 0
+    for i in range(cantidad):
+        print(v[i], end=" ")
+    print()`, inputs: ['20'] },
+'par-crear': { code: `nombres = ["Ana", "Luis", "Sofía", "Pedro"]
+edades = [19, 21, 20, 22]
+notas = [6.1, 4.5, 5.8, 3.9]
+for i in range(len(nombres)):
+    print(nombres[i], "-", edades[i], "años - nota", notas[i])` },
+'par-mejor': { code: `nombres = ["Ana", "Luis", "Sofía", "Pedro"]
+notas = [6.1, 4.5, 5.8, 3.9]
+pos_mejor = 0
+for i in range(1, len(notas)):
+    if notas[i] > notas[pos_mejor]:
+        pos_mejor = i
+print("Mejor:", nombres[pos_mejor])` },
+'par-orden': { code: `nombres = ["Ana", "Luis", "Sofía", "Pedro"]
+edades = [19, 21, 20, 22]
+notas = [6.1, 4.5, 5.8, 3.9]
+n = len(notas)
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        if notas[j] > notas[j + 1]:
+            aux = notas[j]
+            notas[j] = notas[j + 1]
+            notas[j + 1] = aux
+            aux = nombres[j]
+            nombres[j] = nombres[j + 1]
+            nombres[j + 1] = aux
+            aux = edades[j]
+            edades[j] = edades[j + 1]
+            edades[j + 1] = aux
+for i in range(n):
+    print(nombres[i], "-", edades[i], "años - nota", notas[i])` },
+'ej7': { code: `codigos = [101, 102, 103, 104, 105]
+nombres = ["Lápiz", "Regla", "Mochila", "Cuaderno", "Calculadora"]
+precios = [350, 790, 12990, 2490, 15900]
+stock = [0, 0, 5, 30, 3]
+
+# a) Productos sin stock
+lista = ""
+for i in range(len(codigos)):
+    if stock[i] == 0:
+        if lista == "":
+            lista = nombres[i]
+        else:
+            lista = lista + ", " + nombres[i]
+print("Sin stock:", lista)
+
+# b) Buscar por código (búsqueda secuencial)
+buscado = int(input("Código: "))
+pos = -1
+for i in range(len(codigos)):
+    if codigos[i] == buscado:
+        pos = i
+        break
+if pos != -1:
+    print(nombres[pos], "- $" + str(precios[pos]))
+else:
+    print("Código no registrado")
+
+# c) Valor total del inventario
+total = 0
+for i in range(len(codigos)):
+    total = total + precios[i] * stock[i]
+print("Inventario: $" + str(total))
+
+# d) Ordenar por precio con burbuja, manteniendo el paralelismo
+n = len(codigos)
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        if precios[j] > precios[j + 1]:
+            aux = precios[j]
+            precios[j] = precios[j + 1]
+            precios[j + 1] = aux
+            aux = nombres[j]
+            nombres[j] = nombres[j + 1]
+            nombres[j + 1] = aux
+            aux = codigos[j]
+            codigos[j] = codigos[j + 1]
+            codigos[j + 1] = aux
+            aux = stock[j]
+            stock[j] = stock[j + 1]
+            stock[j + 1] = aux
+print("Productos por precio:")
+for i in range(n):
+    print(codigos[i], nombres[i], "- $" + str(precios[i]), "- stock", stock[i])`, inputs: ['104'] },
+};
+
+
+</script>
+<script>
+(function(){
+'use strict';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KW=new Set(['for','in','if','elif','else','while','break','continue','pass','and','or','not','True','False','None']);
+const BI=new Set(['print','input','len','range','int','float','str','round','abs']);
+const PTR={i:'',j:'',k:'',f:'',c:'',fila:'',columna:'',est:'',izq:'g',der:'g',medio:'p',pos:'p',pos_menor:'p',pos_mayor:'p',pos_mejor:'p'};
+const ROWP=['f','fila','est'],COLP=['c','columna'];
+
+/* ---------- piezas de visualización ---------- */
+function listHTML(items,o){
+  o=o||{}; let h='<div class="arr-row">';
+  items.forEach((it,i)=>{
+    const cls='cell'+(o.free!=null&&i>=o.free?' free':'')+(o.hl&&o.hl[i]?' '+o.hl[i]:'')+(o.flash&&o.flash.has(i)?' flash':'');
+    const txt=it.k==='str'&&!o.raw?"'"+it.v+"'":it.v;
+    h+='<div class="cellw"><div class="'+cls+'">'+esc(txt)+'</div>';
+    if(!o.noidx)h+='<div class="ix">'+esc(o.labels?o.labels[i]:i)+'</div>';
+    if(o.ptr)h+='<div class="ptr">'+(o.ptr[i]||[]).map(p=>'<span class="chip '+p.c+'">'+esc(p.n)+'</span>').join('')+'</div>';
+    h+='</div>';
+  });
+  return h+'</div>';
+}
+function matHTML(rows,o){
+  o=o||{}; const nc=rows[0].length;
+  let h='<div class="mat" style="grid-template-columns:auto repeat('+nc+',auto)"><span></span>';
+  for(let c=0;c<nc;c++)h+='<span class="hd'+(o.colOn===c?' on':'')+'">'+esc(o.cols?o.cols[c]:c)+'</span>';
+  rows.forEach((row,r)=>{
+    h+='<span class="hd'+(o.rowOn===r?' on':'')+'" style="text-align:right;padding-right:4px">'+esc(o.rows?o.rows[r]:r)+'</span>';
+    row.forEach((it,c)=>{
+      const k=o.cls?o.cls(r,c):'';
+      const txt=it.k==='str'&&!o.raw?"'"+it.v+"'":it.v;
+      h+='<div class="cell'+(k?' '+k:'')+'" style="min-width:42px">'+esc(txt)+'</div>';
+    });
+  });
+  return h+'</div>';
+}
+const sv=x=>({k:typeof x==='string'?'str':'num',v:String(x)});
+
+function mountViz(el){
+  const v=JSON.parse(el.dataset.v),o=JSON.parse(el.dataset.o||'{}');let h='';
+  if(Array.isArray(v[0])){
+    const rows=v.map(r=>r.map(sv));
+    o.raw=true;
+    const hl=o.hl||{};
+    o.cls=(r,c)=>hl[r+','+c]||hl[r+',*']||'';
+    h=matHTML(rows,o);
+  }else{
+    if(o.name)h+='<div class="arr-name">'+esc(o.name)+'</div>';
+    const labels=o.vars||o.labels;
+    h+=listHTML(v.map(sv),{raw:true,hl:o.hl,free:o.free,labels:labels,noidx:o.noidx&&!o.vars});
+    if(o.note)h+='<div class="ix" style="margin-top:8px">'+esc(o.note)+'</div>';
+  }
+  el.innerHTML='<div class="arr">'+h+'</div>';
+}
+function mountStrips(el){
+  const rows=JSON.parse(el.dataset.rows);
+  el.innerHTML=rows.map(r=>'<div class="strip"><div class="arr">'+listHTML(r.v.map(sv),{raw:true,hl:r.hl,free:r.free,noidx:true})+'</div><div class="st-note">'+esc(r.t)+'</div></div>').join('');
+}
+
+/* ---------- código con colores ---------- */
+function hlLine(t){
+  let q=null,ci=-1;
+  for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c===q)q=null;}else if(c==='"'||c==="'")q=c;else if(c==='#'){ci=i;break;}}
+  const code=ci>=0?t.slice(0,ci):t,com=ci>=0?t.slice(ci):'';
+  const re=/("[^"]*"|'[^']*')|(\b\d+(?:\.\d+)?\b)|([\p{L}_][\p{L}\p{N}_]*)/gu;
+  let out='',last=0,m;
+  while((m=re.exec(code))){
+    out+=esc(code.slice(last,m.index));
+    if(m[1])out+='<span class="s">'+esc(m[1])+'</span>';
+    else if(m[2])out+='<span class="nu">'+m[2]+'</span>';
+    else out+=KW.has(m[3])?'<span class="k">'+m[3]+'</span>':BI.has(m[3])?'<span class="bi">'+m[3]+'</span>':esc(m[3]);
+    last=re.lastIndex;
+  }
+  out+=esc(code.slice(last));
+  if(com)out+='<span class="cm">'+esc(com)+'</span>';
+  return out;
+}
+const HINTS={
+  IndexError:'El índice está fuera del rango: en un vector de tamaño n los índices válidos van de 0 a n − 1.',
+  EOFError:'El programa pidió más datos de los que hay en el recuadro de entrada.',
+  ValueError:'El texto ingresado no se puede convertir a número.',
+  NameError:'Se usó un nombre que no existe: revisa que la variable esté definida antes y escrita igual.',
+  TypeError:'Los tipos de datos no son compatibles en esta operación (por ejemplo, texto con número).',
+  ZeroDivisionError:'No se puede dividir por cero.',
+  RuntimeError:'Revisa la condición del ciclo: probablemente nunca deja de cumplirse.',
+  SyntaxError:'Hay un error de escritura en el código.',IndentationError:'Revisa la sangría (los espacios al inicio de la línea).'
+};
+
+/* ---------- visor paso a paso ---------- */
+function mountRunner(host){
+  const P=PROGRAMS[host.dataset.ex]; if(!P){host.textContent='Programa no encontrado';return;}
+  const presets=host.dataset.presets?JSON.parse(host.dataset.presets):null;
+  const S={code:P.code,inputs:(P.inputs||[]).join('\n'),steps:[],err:null,idx:0,timer:null,speed:700,editing:false,out:''};
+  const needsInput=/input\(/.test(P.code);
+  const uid='r'+Math.random().toString(36).slice(2,8);
+  host.innerHTML=
+   '<div class="rn"><div class="rn-head"><span class="rn-title">'+esc(host.dataset.title||'Ejemplo')+'</span>'+
+   '<span><button class="btn sm" data-a="edit" type="button">Editar código</button></span></div>'+
+   '<div class="rn-grid"><div class="rn-left">'+
+   '<div class="code" data-r="code" tabindex="0" aria-label="Código del programa"></div>'+
+   '<div data-r="editbox" hidden><textarea class="codeed" id="'+uid+'c" spellcheck="false" aria-label="Editar código"></textarea>'+
+   '<div class="ctl" style="margin-top:8px"><button class="btn pri sm" data-a="apply" type="button">Ejecutar este código</button><button class="btn sm" data-a="restore" type="button">Restaurar original</button></div></div>'+
+   (needsInput?'<div data-r="inputs"><div class="lbl"><label for="'+uid+'i">Datos de entrada (uno por línea)</label><span data-r="presets"></span></div><textarea class="inp" id="'+uid+'i" spellcheck="false"></textarea></div>':'')+
+   '<div class="ctl"><button class="btn" data-a="reset" type="button" title="Volver al inicio">⏮ Reiniciar</button>'+
+   '<button class="btn" data-a="prev" type="button">◀ Anterior</button><button class="btn pri" data-a="next" type="button">Siguiente ▶</button>'+
+   '<button class="btn" data-a="play" type="button">▶▶ Reproducir</button><button class="btn" data-a="end" type="button" title="Ir al final">⏭ Final</button></div>'+
+   '<div class="ctl"><input type="range" min="0" max="0" value="0" data-r="slider" aria-label="Paso de la ejecución"><span class="count" data-r="count"></span>'+
+   '<select class="btn sm" data-r="speed" aria-label="Velocidad"><option value="1100">Lento</option><option value="700" selected>Normal</option><option value="250">Rápido</option></select></div>'+
+   '<div class="desc" data-r="desc" aria-live="polite"></div></div>'+
+   '<div class="rn-right"><div><div class="mem-h"><h4>Memoria</h4><span class="legend"><span><i style="background:var(--blue)"></i>se leyó</span><span><i style="background:var(--mag)"></i>se escribió</span></span></div><div class="mem" data-r="mem"></div></div>'+
+   '<div class="con"><span class="tag">Salida</span><pre data-r="out"></pre></div></div></div></div>';
+  const q=s=>host.querySelector('[data-r="'+s+'"]');
+  const codeEl=q('code'),memEl=q('mem'),outEl=q('out'),descEl=q('desc'),slider=q('slider'),countEl=q('count'),editBox=q('editbox');
+  const ta=host.querySelector('textarea.codeed'),inp=host.querySelector('textarea.inp');
+  if(inp){inp.value=S.inputs;inp.rows=Math.max(2,Math.min(6,S.inputs.split('\n').length));}
+  const pset=q('presets');
+  if(pset&&presets){
+    pset.innerHTML=presets.map((p,i)=>'<button type="button" class="preset" data-p="'+i+'">'+esc(p.join(', '))+'</button>').join(' ');
+  }
+  function buildCode(){
+    codeEl.innerHTML=S.code.split('\n').map((t,i)=>'<div class="ln" data-n="'+(i+1)+'"><span class="no">'+(i+1)+'</span><span class="tx">'+(hlLine(t)||' ')+'</span></div>').join('');
+  }
+  function inputsList(){const v=inp?inp.value:'';return v.trim()===''?[]:v.replace(/\n+$/,'').split('\n');}
+  function run(){
+    stop();
+    const r=PyMini.run(S.code,inputsList(),6000);
+    S.steps=r.steps;S.err=r.error;S.out=r.out;S.idx=0;
+    slider.max=S.steps.length-1;
+    buildCode();render();
+  }
+  function memHTML(st,prev){
+    const vs=st.vars,names=Object.keys(vs);
+    if(!names.length)return '<span class="meta" style="font-size:14px">Aún no hay variables.</span>';
+    const sc=names.filter(n=>vs[n].k!=='list'),ls=names.filter(n=>vs[n].k==='list');
+    let h='';
+    if(sc.length)h+='<div class="vars">'+sc.map(n=>{
+      const v=vs[n],pv=prev&&prev.vars[n];const ch=!pv||pv.v!==v.v;
+      return '<span class="var'+(ch&&st.line?' chg':'')+'"><span class="vn">'+esc(n)+'</span><span class="vv">'+esc(v.k==='str'?"'"+v.v+"'":v.v)+'</span></span>';
+    }).join('')+'</div>';
+    const R={},W={};
+    (st.r||[]).forEach(a=>{(R[a.id]=R[a.id]||new Set()).add(a.i);});
+    (st.w||[]).forEach(a=>{(W[a.id]=W[a.id]||new Set()).add(a.i);});
+    const ints=n=>vs[n]&&vs[n].k==='int'?parseInt(vs[n].v,10):null;
+    ls.forEach(n=>{
+      const L=vs[n],items=L.items,is2=items.length&&items.every(x=>x.k==='list');
+      h+='<div><div class="arr-name">'+esc(n)+' <small>'+(is2?'matriz '+items.length+'×'+items[0].items.length:'tamaño '+items.length)+'</small></div><div class="arr" style="overflow-x:auto">';
+      if(is2){
+        const rowOn=ROWP.map(ints).find(x=>x!==null&&x>=0&&x<items.length),colOn=COLP.map(ints).find(x=>x!==null&&x>=0&&x<items[0].items.length);
+        h+=matHTML(items.map(r=>r.items),{rowOn:rowOn,colOn:colOn,cls:(r,c)=>{const id=items[r].id;return W[id]&&W[id].has(c)?'m':R[id]&&R[id].has(c)?'b':'';}});
+      }else{
+        const hl={},fl=new Set(),ptr={};
+        items.forEach((x,i)=>{if(W[L.id]&&W[L.id].has(i)){hl[i]='m';fl.add(i);}else if(R[L.id]&&R[L.id].has(i))hl[i]='b';});
+        Object.keys(PTR).forEach(p=>{const v=ints(p);if(v!==null&&v>=0&&v<items.length&&p!==n)(ptr[v]=ptr[v]||[]).push({n:p,c:PTR[p]});});
+        const cant=ints('cantidad');
+        h+=listHTML(items,{hl:hl,flash:fl,ptr:ptr,free:cant!==null&&cant>=0&&cant<=items.length&&items.length>cant?cant:null});
+      }
+      h+='</div></div>';
+    });
+    return h;
+  }
+  function render(){
+    const st=S.steps[S.idx],prev=S.idx>0?S.steps[S.idx-1]:null,last=S.idx===S.steps.length-1;
+    codeEl.querySelectorAll('.cur,.err').forEach(e=>e.classList.remove('cur','err'));
+    const errNow=S.err&&(last||!S.steps.length>1)?S.err:null;
+    const lineN=st.line||(errNow&&S.steps.length===1?errNow.line:0);
+    if(lineN){const e=codeEl.querySelector('.ln[data-n="'+lineN+'"]');if(e){e.classList.add(st.error||(errNow&&S.steps.length===1)?'err':'cur');const t=e.offsetTop-codeEl.clientHeight/2;if(Math.abs(codeEl.scrollTop-t)>codeEl.clientHeight/3-20)codeEl.scrollTop=Math.max(0,t);}}
+    memEl.innerHTML=memHTML(st,prev);
+    let o=S.out.slice(0,st.outLen||0),oh=esc(o);
+    if(S.err&&last&&S.steps.length>=1&&(st.error||S.steps.length===1)){
+      oh+='<span class="er">'+esc(S.err.type+': '+S.err.msg)+'</span>'+(S.err.line?' <span class="hint" style="display:inline">(línea '+S.err.line+')</span>':'')+'<span class="hint">'+esc(HINTS[S.err.type]||'')+'</span>';
+    }
+    outEl.innerHTML=oh||'<span class="meta" style="font-family:var(--font-b);font-size:13.5px">Aquí aparece lo que imprime el programa.</span>';
+    outEl.scrollTop=outEl.scrollHeight;
+    let d;
+    if(S.err&&S.steps.length===1)d='<b>'+esc(S.err.type)+'</b> en la línea '+S.err.line+': '+esc(S.err.msg)+'. '+esc(HINTS[S.err.type]||'');
+    else if(st.error)d='<b>'+esc(st.error.type)+'</b>: '+esc(st.error.msg)+'. '+esc(HINTS[st.error.type]||'');
+    else if(S.idx===0)d='Pulsa <b>Siguiente</b> para ejecutar la primera línea.';
+    else d='<b>Línea '+st.line+'</b>'+(st.desc?' · '+esc(st.desc):'')+(st.end?'':'');
+    if(st.end)d='<b>Fin del programa</b>. Pulsa <b>Reiniciar</b> para verlo de nuevo.';
+    descEl.innerHTML=d;descEl.classList.toggle('err',!!(st.error||(S.err&&S.steps.length===1)));
+    slider.value=S.idx;countEl.textContent='Paso '+S.idx+' / '+(S.steps.length-1);
+    host.querySelector('[data-a="prev"]').disabled=S.idx===0;host.querySelector('[data-a="reset"]').disabled=S.idx===0;
+    host.querySelector('[data-a="next"]').disabled=last;host.querySelector('[data-a="end"]').disabled=last;
+    const pb=host.querySelector('[data-a="play"]');pb.textContent=S.timer?'⏸ Pausar':'▶▶ Reproducir';pb.disabled=last&&!S.timer;
+  }
+  function stop(){if(S.timer){clearInterval(S.timer);S.timer=null;}}
+  function go(i){S.idx=Math.max(0,Math.min(S.steps.length-1,i));render();}
+  host.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b||!host.contains(b))return;
+    if(b.dataset.p!==undefined){
+      inp.value=presets[+b.dataset.p].join('\n');
+      host.querySelectorAll('.preset').forEach(x=>x.classList.toggle('sel',x===b));run();return;}
+    const a=b.dataset.a;
+    if(a==='next'){stop();go(S.idx+1);}
+    else if(a==='prev'){stop();go(S.idx-1);}
+    else if(a==='reset'){stop();go(0);}
+    else if(a==='end'){stop();go(S.steps.length-1);}
+    else if(a==='play'){
+      if(S.timer){stop();render();return;}
+      if(S.idx>=S.steps.length-1)S.idx=0;
+      S.timer=setInterval(()=>{if(S.idx>=S.steps.length-1){stop();render();return;}go(S.idx+1);if(S.idx>=S.steps.length-1)stop();render();},S.speed);render();}
+    else if(a==='edit'){
+      S.editing=!S.editing;editBox.hidden=!S.editing;codeEl.hidden=S.editing;
+      b.textContent=S.editing?'Volver al visor':'Editar código';
+      if(S.editing){ta.value=S.code;ta.focus();}else{S.code=ta.value;run();}}
+    else if(a==='apply'){S.code=ta.value;S.editing=false;editBox.hidden=true;codeEl.hidden=false;host.querySelector('[data-a="edit"]').textContent='Editar código';run();}
+    else if(a==='restore'){ta.value=P.code;}
+  });
+  slider.addEventListener('input',()=>{stop();go(+slider.value);});
+  host.querySelector('[data-r="speed"]').addEventListener('change',e=>{S.speed=+e.target.value;if(S.timer){stop();host.querySelector('[data-a="play"]').click();}});
+  if(inp){let t;inp.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(run,300);});}
+  run();
+}
+
+/* ---------- página ---------- */
+function init(){
+  document.querySelectorAll('.viz').forEach(mountViz);
+  document.querySelectorAll('.strips').forEach(mountStrips);
+  document.querySelectorAll('.rn-host').forEach(mountRunner);
+  const links=[...document.querySelectorAll('#navlist a')];
+  links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const t=document.getElementById(a.getAttribute('href').slice(1));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}));
+  const secs=links.map(a=>document.getElementById(a.getAttribute('href').slice(1)));
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+en.target.id));}});},{rootMargin:'-15% 0px -75% 0px'});
+    secs.forEach(s=>s&&io.observe(s));
+  }
+  links[0].classList.add('on');
+  const tg=document.getElementById('toggleSol');
+  tg.addEventListener('click',()=>{const h=document.body.classList.toggle('hide-sol');tg.textContent=h?'Mostrar resoluciones':'Ocultar resoluciones';tg.setAttribute('aria-pressed',h);});
+  document.getElementById('expandSol').addEventListener('click',()=>{document.body.classList.remove('hide-sol');tg.textContent='Ocultar resoluciones';document.getElementById('ej1').scrollIntoView({behavior:'smooth'});});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+</body>
+</html>
+
+</body></html>
